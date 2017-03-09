@@ -1,0 +1,213 @@
+package cn.ffcs.txb.entity;
+
+import java.io.Serializable;
+import java.math.BigInteger;
+import java.util.Date;
+
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
+import javax.persistence.Table;
+
+
+@SuppressWarnings("serial")
+@Entity
+@Table(name = "user_expand")
+public class UserExpand implements Serializable {
+	private BigInteger id;
+	private BigInteger userId;
+	private Date insertDate;
+	private Date updateDate;
+	private String createName;
+	private String updateName;
+	private int logingCount;
+	private String nickname;
+	private String tel;
+	private String city;
+	private String qx;
+	private String school;
+	private String grade;
+	private String tschool;
+	private int score;
+	private String referee;
+	private String arttype;
+	private String name;
+	private BigInteger school_id;
+	private String teacher_tel;
+	private String status;
+	private String img;
+	private String address;
+
+	
+	public UserExpand() {}
+	@Id
+	@GeneratedValue
+	@Column(name="id", columnDefinition="bigint(20) comment '主键ID'")
+	public BigInteger getId() {
+		return id;
+	}
+	@Column(name="userId", unique=true, columnDefinition="bigint(20) comment '用户ID'")
+	public BigInteger getUserId() {
+		return userId;
+	}
+	@Column(name="insertDate", columnDefinition="datetime comment '新增年月日'")
+	public Date getInsertDate() {
+		return insertDate;
+	}
+	@Column(name="updateDate", columnDefinition="datetime comment '更新年月日'")
+	public Date getUpdateDate() {
+		return updateDate;
+	}
+	@Column(name="createName", columnDefinition="varchar(32) comment '创建人'")
+	public String getCreateName() {
+		return createName;
+	}
+	@Column(name="updateName", columnDefinition="varchar(32) comment '修改人'")
+	public String getUpdateName() {
+		return updateName;
+	}
+	@Column(name="logingCount", columnDefinition="int(20) comment '登录次数'")
+	public int getLogingCount() {
+		return logingCount;
+	}
+	@Column(name="nickname", columnDefinition="int(20) comment '昵称'")
+	public String getNickname() {
+		return nickname;
+	}
+	@Column(name="tel", columnDefinition="int(20) comment '手机号'")
+	public String getTel() {
+		return tel;
+	}
+	@Column(name="city", columnDefinition="int(20) comment '城市'")
+	public String getCity() {
+		return city;
+	}
+	@Column(name="qx", columnDefinition="int(20) comment '区县'")
+	public String getQx() {
+		return qx;
+	}
+	@Column(name="school", columnDefinition="int(20) comment '学校'")
+	public String getSchool() {
+		return school;
+	}
+	@Column(name="grade", columnDefinition="int(20) comment '年级'")
+	public String getGrade() {
+		return grade;
+	}
+	@Column(name="tschool", columnDefinition="int(20) comment '培训学校'")
+	public String getTschool() {
+		return tschool;
+	}
+	@Column(name="score", columnDefinition="int(20) comment '积分'")
+	public int getScore() {
+		return score;
+	}
+	@Column(name="referee", columnDefinition="int(20) comment '推荐人'")
+	public String getReferee() {
+		return referee;
+	}
+	@Column(name="arttype", columnDefinition="int(20) comment '艺考类型'")
+	public String getArttype() {
+		return arttype;
+	}
+	@Column(name="name", columnDefinition="int(20) comment '姓名'")
+	public String getName() {
+		return name;
+	}
+	@Column(name="school_id", columnDefinition="int(20) comment '学校id'")
+	public BigInteger getSchool_id() {
+		return school_id;
+	}
+	@Column(name="teacher_tel", columnDefinition="int(20) comment '老师电话'")
+	public String getTeacher_tel() {
+		return teacher_tel;
+	}
+	@Column(name="status", columnDefinition="int(20) comment '账户状态'")
+	public String getStatus() {
+		return status;
+	}
+	@Column(name="img", columnDefinition="图片base64")
+	public String getImg() {
+		return img;
+	}
+	@Column(name="address", columnDefinition="图片base64")
+	public String getEducationStage() {
+		return address;
+	}
+	public void setEducationStage(String address) {
+		this.address = address;
+	}
+	public void setImg(String img) {
+		this.img = img;
+	}
+	public void setId(BigInteger id) {
+		this.id = id;
+	}
+	public void setUserId(BigInteger userId) {
+		this.userId = userId;
+	}
+	public void setInsertDate(Date insertDate) {
+		this.insertDate = insertDate;
+	}
+	public void setUpdateDate(Date updateDate) {
+		this.updateDate = updateDate;
+	}
+	public void setCreateName(String createName) {
+		this.createName = createName;
+	}
+	public void setUpdateName(String updateName) {
+		this.updateName = updateName;
+	}
+	public void setLogingCount(int logingCount) {
+		this.logingCount = logingCount;
+	}
+	public void setNickname(String nickname) {
+		this.nickname = nickname;
+	}
+	public void setTel(String tel) {
+		this.tel = tel;
+	}
+	public void setCity(String city) {
+		this.city = city;
+	}
+	public void setQx(String qx) {
+		this.qx = qx;
+	}
+	public void setSchool(String school) {
+		this.school = school;
+	}
+	public void setGrade(String grade) {
+		this.grade = grade;
+	}
+	public void setTschool(String tschool) {
+		this.tschool = tschool;
+	}
+	public void setScore(int score) {
+		this.score = score;
+	}
+	public void setReferee(String referee) {
+		this.referee = referee;
+	}
+	public void setArttype(String arttype) {
+		this.arttype = arttype;
+	}
+	public void setName(String name) {
+		this.name = name;
+	}
+	public void setSchool_id(BigInteger school_id) {
+		this.school_id = school_id;
+	}
+	public void setTeacher_tel(String teacher_tel) {
+		this.teacher_tel = teacher_tel;
+	}
+	public void setStatus(String status) {
+		this.status = status;
+	}
+	
+	
+	
+	
+	
+	
+}

@@ -1,0 +1,73 @@
+@charset "utf-8";
+
+/**全文样式**/
+body{
+	font-size:12px;
+	font-family: Verdana,Arial,Helvetica,sans-serif;
+}
+
+.disabled{
+	background:#eee;
+}
+
+.required{
+	font-size:14px;
+	color:red;
+	font-weight:bold;
+	font-family: Verdana,Arial,Helvetica,sans-serif;
+}
+
+/**页面全文**/
+.page_body{
+	font-size:12px;
+	font-family: Verdana,Arial,Helvetica,sans-serif;
+	background:#FFFFFF;
+}
+
+/**边框(frame)区域样式**/
+.frame{
+	border:1px solid silver;
+	margin-top:5px;
+}
+
+.frame table{
+	border:0px solid black;
+	margin:5px;
+}
+
+table.form_tabel{
+	border: 1px solid silver;
+	background: none repeat scroll 0 0 white;
+	font-size: 12px;
+	width: 100%;
+}
+.form_tabel td {
+	border-width: 0;
+	font-family: Verdana,Arial,Helvetica,sans-serif;
+	padding: 0;
+	vertical-align: middle;
+	padding-left:3px;
+	white-space:nowrap;
+}
+.form_tabel .td_title {
+	background-color: #C2CDD6;
+	font-weight: bold;
+	padding: 1px;
+	max-width: 200px;
+	min-width: 40px;
+}
+.form_tabel .td_detail {
+	background-color: #EDEDED;
+	padding: 1px;
+}
+.form_tabel .td_detail input[type='text']{
+	width:98%;
+}
+
+.validate_remove{
+	background-color: #FFFEE;
+}
+
+textarea{
+    font-size: 12px;
+}

@@ -1,0 +1,13 @@
+busi.BroadcastSpecific.titleTag2 = \u7279\u5b9a\u7528\u6237\u5e7f\u64ad
+busi.BroadcastSpecific.stairContent = \u4e00\u7ea7\u5185\u5bb9\uff1a
+busi.BroadcastSpecific.extendContent = \u6269\u5c55\u5185\u5bb9\uff1a
+busi.BroadcastSpecific.buttonIssue = \u53d1\u5e03 
+busi.BroadcastSpecific.buttonIssueAgain = \u518d\u6b21\u53d1\u5e03 
+busi.BroadcastSpecific.IssueObject = \u53d1\u5e03\u5bf9\u8c61
+busi.BroadcastSpecific.clean = \u6e05\u7a7a
+busi.BroadcastSpecific.issueTypeByUserName = \u6307\u5b9a\u7528\u6237
+busi.BroadcastSpecific.issueTypeByVehicleStatus = \u8f66\u8f86\u5f53\u524d\u72b6\u6001
+busi.BroadcastSpecific.issueTypeByVehicleArea = \u8f66\u8f86\u5f53\u524d\u533a\u57df
+busi.BroadcastSpecific.userName = \u7528\u6237\u540d\uff1a
+busi.BroadcastSpecific.remark = \u591a\u4e2a\u7528\u6237\u540d\u95f4\u53ef\u4ee5\u4f7f\u7528\u201c,\u201d\u4e3a\u901a\u914d\u7b26\u9694\u5f00
+busi.BroadcastSpecific.contentLength = \u53ef\u8f93\u5165\u603b\u5b57\u6570100\u5b57\uff0c\u8fd8\u53ef\u4ee5\u5728\u8f93\u5165100\u5b57

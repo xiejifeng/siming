@@ -1,0 +1,87 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+	pageEncoding="UTF-8"%>
+<%@include file="/plugins/customer/jsp/appcommon.jsp"%>
+<!DOCTYPE>
+<html>
+<head>
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0;" name="viewport" />
+	<title>思明E学</title>
+	<link href="<%=path%>resources/app/common/css/style.css" rel="stylesheet">
+	<link href="<%=path%>resources/app/common/css/iosSelect.css" rel="stylesheet">
+</head>
+	<body>
+		<div class="title-box">
+			<span class="g-left-icon" onclick="">
+				<img src="<%=path%>resources/app/common/imgs/back.png" onclick="Common.back(7,2);"/>
+			</span>
+			<h1 class="title">兑换记录</h1>
+			<span class="g-right-icon">
+					<button class="sign-btn" onclick="Personal.index();"><img style="width: 0.4rem;" src="<%=path%>resources/app/common/imgs/qd.png" /></button>
+			</span>
+		</div>
+		<ul class="g-tab-box video-tab-box">
+			<li class="tab-list tab1">
+				<a href="javascript:void(0);" class="active">M币使用</a>
+			</li>
+			<li class="tab-list tab2">
+				<a href="javascript:void(0);">M币奖励</a>
+			</li>
+		</ul>
+		<div class="g-curriculumlist-box">
+			<ul class="g-list-box tab1-box">
+				<div class="g-form-group-box">
+					<dl class="sign-table">
+						<dt><span>日期</span><span>项目</span><span>M币</span></dt>
+						<c:set value="0" var="sum" />
+						<c:forEach items="${scoreRecord}" var="item">
+						   <c:if test="${item.incr_score<0}">
+						       <c:set value="${sum+1}" var="sum" />
+						       <dd><span>${item.createtime}</span><span>${item.remark}</span><span class="sign-status">${item.incr_score }</span></dd>
+						   </c:if>
+						</c:forEach>
+					</dl>
+					 <c:if test="${sum == 0}">
+				 			<div class="empty-box"><!--我是没有课程的时候消息提示框-->
+								<img src="<%=path%>resources/app/common/imgs/jifenfull.png" />
+								<span>当前没有积分使用记录哦！</span>
+							</div>    
+		            </c:if>
+				</div>
+			</ul>
+			<ul class="g-list-box tab2-box">
+				<div class="g-form-group-box">
+					<dl class="sign-table">
+						<dt><span>日期</span><span>项目</span><span>积分</span></dt>
+						<c:set value="0" var="sum2" />
+						<c:forEach items="${scoreRecord}" var="item">
+						   <c:if test="${item.incr_score>0}">
+						       <c:set value="${sum2+1}" var="sum2" />
+						       <dd><span>${item.createtime}</span><span>${item.remark}</span><span class="sign-status integral-add">${item.incr_score }</span></dd>
+						   </c:if>
+						</c:forEach>
+					</dl>
+				
+					<c:if test="${sum2 == 0}">
+				 			<div class="empty-box"><!--我是没有课程的时候消息提示框-->
+								<img src="<%=path%>resources/app/common/imgs/jifenfull.png" />
+								<span>当前没有积分奖励记录哦！</span>
+							</div>    
+		            </c:if>
+				</div>
+			</ul>
+		</div>
+	<!--加载层组件-->
+	<div id = "mask" class="g-loading-bg-box dis_none">
+		<div class="g-loading-box">
+			<div class="typing_loader"></div>
+			<p class="loading-text">努力加载中</p>
+		</div>
+	</div>
+	</body>
+	<script type="text/javascript" src="<%=path%>resources/app/common/js/width.js"></script>
+	<script type="text/javascript" src="<%=path%>resources/app/common/js/btn.js"></script>
+	<script type="text/javascript" src="<%=path%>resources/app/common/js/iosSelect.js"></script>
+	<script type="text/javascript" src="<%=path%>resources/app/common/js/iscroll.js"></script>
+</html>

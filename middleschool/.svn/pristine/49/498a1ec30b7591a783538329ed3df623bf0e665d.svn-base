@@ -1,0 +1,736 @@
+/**
+ * OpthisServiceImpl.java	  V1.0   2014年7月18日 上午11:05:36
+ *
+ * Copyright 2014 FUJIAN FUJITSU COMMUNICATION SOFTWARE CO., LTD. All rights reserved.
+ *
+ * Modification history(By    Time    Reason):
+ * 
+ * Description:
+ */
+
+package cn.ffcs.txb.service.personal.impl;
+
+import java.math.BigInteger;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import javax.annotation.Resource;
+
+import org.springframework.security.authentication.encoding.MessageDigestPasswordEncoder;
+import org.springframework.stereotype.Service;
+
+import com.mongodb.util.Hash;
+
+import cn.ffcs.srp.app.user.dao.IUserDAO;
+import cn.ffcs.srp.util.i18n.GlobalUtil;
+import cn.ffcs.txb.common.log.OperationLogService;
+import cn.ffcs.txb.common.model.Constant;
+import cn.ffcs.txb.common.util.DateCommonUtils;
+import cn.ffcs.txb.common.util.MobileUtil;
+import cn.ffcs.txb.common.util.PinyinUtils;
+import cn.ffcs.txb.common.util.Util;
+import cn.ffcs.txb.dao.chatroom.IChatRoomDAO;
+import cn.ffcs.txb.dao.comment.ICommentDAO;
+import cn.ffcs.txb.dao.feedback.IFeedBackDAO;
+import cn.ffcs.txb.dao.flowExchange.IFlowExchangeDAO;
+import cn.ffcs.txb.dao.loginrecord.ILoginRecordDAO;
+import cn.ffcs.txb.dao.opthis.IOpthisDAO;
+import cn.ffcs.txb.dao.report.IReportDAO;
+import cn.ffcs.txb.dao.score.IScoreDAO;
+import cn.ffcs.txb.dao.sign.ISignDAO;
+import cn.ffcs.txb.dao.userExpand.IUserExpandDAO;
+import cn.ffcs.txb.entity.Chatroom;
+import cn.ffcs.txb.entity.Comment;
+import cn.ffcs.txb.entity.Exchange;
+import cn.ffcs.txb.entity.FeedBack;
+import cn.ffcs.txb.entity.LoginRecord;
+import cn.ffcs.txb.entity.Product;
+import cn.ffcs.txb.entity.Report;
+import cn.ffcs.txb.entity.Score;
+import cn.ffcs.txb.entity.Sign;
+import cn.ffcs.txb.entity.UserExpand;
+import cn.ffcs.txb.service.personal.IPersonalService;
+
+/**
+ * 功能描述：
+ * 
+ * @author ：余冬平
+ * 
+ *         修改历史：(修改人，修改时间，修改原因/内容)
+ */
+@Service
+public class PersonalServiceImpl implements IPersonalService {
+
+	@Resource
+	private IOpthisDAO opthisDao;
+
+	@Resource
+	private ILoginRecordDAO loginRecordDAO;
+
+	@Resource
+	private IFeedBackDAO feedBackDAO;
+	
+	@Resource
+	private ISignDAO signDAO;
+	
+	@Resource
+	private IUserExpandDAO userExpandDAO;
+
+	@Resource
+	private IUserExpandDAO dao;
+	
+	@Resource
+	private IChatRoomDAO chatRoomDAO;
+
+	@Resource
+	private IUserDAO userDAO;
+	
+	@Resource
+	private IScoreDAO scoreDAO;
+	
+	@Resource
+	private IReportDAO reportDAO;
+
+	@Resource
+	private MessageDigestPasswordEncoder passwordEncoder;
+
+	@Resource
+	private OperationLogService operationLogService;
+	
+	@Resource
+	private ICommentDAO commentDAO;
+
+	// added by xiejifeng
+	@Resource
+	private IFlowExchangeDAO exchangeDAO;
+	
+	@Override
+	public Map<String, Object> saveUser(Map<String, Object> userInfo) {
+		Map<String, Object> result = new HashMap<>();
+		int row = 0;
+		// 新建用户
+		String username = userInfo.get("username").toString();
+		String userType = userInfo.get("usertype").toString();
+		String pasword = this.passwordEncoder.encodePassword(userInfo
+				.get("pwd").toString(), username);
+		// 保存用户
+		if (Constant.DIC_USERTYPE_STUDENT.equals(userType)) {
+			row = this.dao.doExecuteSqlAndNamedQuery("SQL_USEREXPAND_9",
+					new Object[] { username, pasword, true, false,
+							Constant.USER_TYPE_ST, true });
+		} else {
+			row = this.dao.doExecuteSqlAndNamedQuery("SQL_USEREXPAND_9",
+					new Object[] { username, pasword, true, false,
+							Constant.USER_TYPE_TE, true });
+		}
+		//
+		row = row + saveUserExpand(userInfo);
+		if (row > 0) {
+			result.put("resultCode", "0");
+			result.put("resultMsg", "用户注册成功");
+		} else {
+			result.put("resultCode", "1");
+			result.put("resultMsg", "用户注册失败");
+		}
+		return result;
+	}
+
+	@Override
+	public Map<String, Object> checkLoginInfo(String username, String password,
+			String ipAddr) {
+		Map<String, Object> userInfo = userDAO.findUniqueBySqlAndNamedQuery(
+				"SQL_App_1", new Object[] { username, username });
+		LoginRecord loginRecord = new LoginRecord();
+		BigInteger userId;
+		if (userInfo != null) {
+			String uname = userInfo.get("username").toString();
+			String upwd = userInfo.get("password").toString();
+			String pwd = this.passwordEncoder.encodePassword(password, uname);
+			if (upwd.equals(pwd)) {
+				userInfo.put("resultCode", "0");
+			} else {
+				userInfo.put("resultCode", "1");
+				userInfo.put("resultMsg", "密码错误,请重新输入。");
+			}
+			userId = (BigInteger) userInfo.get("userId");
+		} else {
+			userId = BigInteger.valueOf(0);
+			userInfo = new HashMap<String, Object>();
+			userInfo.put("resultCode", "1");
+			userInfo.put("resultMsg", "该用户名或手机未注册。");
+		}
+		loginRecord.setLogin_ip(ipAddr);
+		loginRecord.setLogin_time(new Date());
+		loginRecord.setUser_id(userId);
+		loginRecordDAO.save(loginRecord);
+		return userInfo;
+	}
+
+	@Override
+	public List<Map<String, Object>> findDictionaryInfoByCode(String code,String type) {
+        if("0".equals(type)){
+        	return this.userDAO.findBySqlAndNamedQuery("SQL_App_2",new Object[] { code });
+        }else{
+        	return this.userDAO.findBySqlAndNamedQuery("SQL_App_11",new Object[] { code });
+        }
+	}
+
+	/**
+	 * 
+	 * 功能描述：保存用户扩展表和用户角色
+	 * 
+	 * @author ：林炳兴 创建日期 ：2014年8月29日 下午3:34:22
+	 * 
+	 * @param userDTO
+	 * @return
+	 * 
+	 *         修改历史 ：(修改人，修改时间，修改原因/内容)
+	 */
+	public int saveUserExpand(Map<String, Object> userInfo) {
+		// 得到用户的id
+		int row = 0;
+		BigInteger userId = null;
+		Map<String, Object> userMap = this.userDAO
+				.findUniqueBySqlAndNamedQuery("SQL_USEREXPAND_6", null);
+		if (userMap != null) {
+			userId = (BigInteger) userMap.get("userId");
+		}
+		// 根据用户id,保存用户的角色
+		if (userId != null) {
+			// 用户扩展表
+			UserExpand userExpand = new UserExpand();
+			userExpand.setUserId(userId);
+			userExpand.setInsertDate(new Date());
+			userExpand.setUpdateDate(new Date());
+			userExpand.setCreateName("");
+			userExpand.setUpdateName("");
+			userExpand.setLogingCount(0);
+			userExpand.setCity(userInfo.get("city")==null?"":userInfo.get("city").toString());
+			userExpand.setArea(userInfo.get("area")==null?"":userInfo.get("area").toString());
+			userExpand.setGrade(userInfo.get("grade")== null ? "": userInfo.get("grade").toString());
+			userExpand.setSex(userInfo.get("sex")== null ? "": userInfo.get("sex").toString());
+			userExpand.setAddress(userInfo.get("address")== null ? "": userInfo.get("address").toString());
+			userExpand.setName(userInfo.get("name")==null?"":userInfo.get("name").toString());
+			userExpand.setNickname(userInfo.get("username").toString());
+			userExpand.setSchool(userInfo.get("school")== null ? "": userInfo.get("school").toString());
+			String userType = userInfo.get("usertype").toString();
+			if (Constant.DIC_USERTYPE_STUDENT.equals(userType)) {
+				userExpand.setScore(100);
+			}else{
+				userExpand.setScore(0);
+			}
+			userExpand.setStatus(Constant.TEACHER_ACCOUNT_UNCHECK);
+			userExpand.setTel(userInfo.get("tel").toString());
+			userExpand.setImg(userInfo.get("img").toString());
+			this.dao.save(userExpand);
+			// 日志操作
+			operationLogService.saveLogOperation(userInfo.get("username").toString(), "用户扩展新增成功", new Date());
+		}
+		return row;
+	}
+
+	@Override
+	public boolean isExistUserNameOrTel(String username) {
+		Map<String, Object> userInfo = userDAO.findUniqueBySqlAndNamedQuery(
+				"SQL_App_1", new Object[] { username, username });
+		if (userInfo != null) {
+			return true;
+		}
+		return false;
+	}
+
+	@Override
+	public int updateUserPwd(String tel, String newPwd) {
+		Map<String, Object> userInfo = userDAO.findUniqueBySqlAndNamedQuery(
+				"SQL_App_3", new Object[] { tel });
+		String userId = "";
+		int rows = 0;
+		if (userInfo != null) {
+			userId = userInfo.get("userId").toString();
+			String pwd = this.passwordEncoder.encodePassword(newPwd,
+					userInfo.get("username"));
+			rows = rows
+					+ this.userDAO.doExecuteSqlAndNamedQuery(
+							"SQL_USEREXPAND_4", new Object[] { pwd, userId });
+			return rows;
+		} else {
+			return 0;
+		}
+	}
+
+	@Override
+	public Map<String, Object> saveFeedBack(String context,
+			Map<String, Object> userinfo) {
+		Map<String, Object> result = new HashMap<>();
+		BigInteger userId = (BigInteger) userinfo.get("userId");
+		FeedBack feedBack = new FeedBack();
+		try {
+			feedBack.setCreatetime(new Date());
+			feedBack.setFeedback_content(context);
+			feedBack.setUser_id(userId);
+			feedBackDAO.save(feedBack);
+			result.put("resultCode", "0");
+			result.put("resultMsg", "保存反馈信息成功");
+		} catch (Exception e) {
+			// TODO: handle exception
+			result.put("resultCode", "1");
+			result.put("resultMsg", "保存反馈信息失败!");
+		}
+		return result;
+	}
+
+	@Override
+	public List<Map<String, Object>> findSignInfo(String userId,String startTime, String endTime) {
+		
+		return this.userDAO.findBySqlAndNamedQuery("SQL_App_4",new Object[] { userId});
+	}
+
+	@Override
+	public Map<String, Object> findUserInfo(String userId) {
+		
+		return this.dao.findUniqueBySqlAndNamedQuery("SQL_App_5", new Object[]{userId});
+	}
+
+	@Override
+	public List<Map<String, Object>> findUnPassStuInfo(String tel) {
+		// TODO Auto-generated method stub
+		return this.userDAO.findBySqlAndNamedQuery("SQL_App_6",new Object[] {tel});
+	}
+
+	@Override
+	public Map<String, Object> updateCheckStudentInfo(String userIds) {
+		Map<String, Object> result = new HashMap<>();
+		try {
+			this.dao.doExecuteSqlAndNamedQuery("SQL_App_7", new Object[]{Constant.TEACHER_ACCOUNT_CHECK,userIds});
+			result.put("resultCode", "0");
+			result.put("resultMsg", "审核操作成功");
+		} catch (Exception e) {
+			result.put("resultCode", "1");
+			result.put("resultMsg", "审核操作失败");
+		}
+		return result;
+	}
+
+	@Override
+	public Map<String, Object> saveSign(String courseId,String name,Map<String, Object> userinfo) {
+		Map<String, Object> result = new HashMap<>();
+		BigInteger userId = (BigInteger) userinfo.get("userId");
+	    boolean flag = isExistSignInfo(userId,courseId);
+	    if(flag){
+			result.put("resultCode", "1");
+			result.put("resultMsg", "该课程已签到!");
+			return result;
+	    }
+		Sign  sign = new Sign();
+		try {
+			sign.setCourse_id(courseId);
+			sign.setUser_id(userId);
+			sign.setCreatetime(new Date());
+			sign.setSigntime(new Date());
+			sign.setCourse_name(name);
+			this.signDAO.save(sign);
+			result.put("resultCode", "0");
+			result.put("resultMsg", "签到成功");
+			//更新积分
+			this.signDAO.doExecuteSqlAndNamedQuery("SQL_App_10", new Object[]{userId});
+			//添加一条积分记录
+			Score  score = new Score();
+			int oldScore =(int)userinfo.get("score");
+			score.setIncr_score(100);
+			score.setNow_score(oldScore);
+			score.setLast_score(oldScore+100);
+			score.setUser_id(userId);
+			score.setScore_change_type(Constant.SCORE_CHANGE_TYPE_SING);
+			score.setCreatetime(new Date());
+			score.setRemark("上课签到");
+			this.scoreDAO.save(score);
+		} catch (Exception e) {
+			// TODO: handle exception
+			result.put("resultCode", "1");
+			result.put("resultMsg", "签到失败!");
+		}
+		return result;
+	}
+
+	@Override
+	public boolean isExistSignInfo(BigInteger userId, String courseId) {
+		List<Map<String, Object>> data =  this.userDAO.findBySqlAndNamedQuery("SQL_App_8",new Object[] { userId ,courseId});
+		if(data!=null&&data.size()>0){
+			return true;
+		}
+		return false;
+	}
+
+	@Override
+	public Map<String, Object> isExistChatRoom(String courseId) {
+		return this.userDAO.findUniqueBySqlAndNamedQuery("SQL_App_9",new Object[] {courseId});
+	}
+
+	@Override
+	public Map<String, Object> saveChatRoomInfo(String targetId, String name) {
+		Map<String, Object> result = new HashMap<>();
+	    try {
+	    	Chatroom chatroom = new Chatroom();
+	    	chatroom.setCreatetime(new Date());
+	    	chatroom.setName(name);
+	    	chatroom.setStatus(0);
+	    	chatroom.setTargetId(targetId);
+	    	this.chatRoomDAO.save(chatroom);
+			result.put("resultCode", "0");
+			result.put("resultMsg", "保存成功!");
+		} catch (Exception e) {
+			result.put("resultCode", "1");
+			result.put("resultMsg", "保存失败!");
+		}
+		return result;
+	}
+
+	@Override
+	public Map<String, Object> updateUserInfo(BigInteger userId,Map<String, Object> userInfo) {
+		Map<String, Object> result = new HashMap<>();
+		StringBuffer sb = new StringBuffer();
+        sb.append("UPDATE user_expand ue set ue.updateDate = NOW() ");
+        try {
+        	if(userInfo.containsKey("name")){
+        		if(!"".equals(userInfo.get("name"))){
+        			sb.append(" ,ue.name='"+userInfo.get("name")+"'");
+        		}
+        	}
+        	if(userInfo.containsKey("city")){
+        		if(!"".equals(userInfo.get("city"))){
+        			sb.append(" ,ue.city='"+userInfo.get("city")+"'");
+        		}
+        	}
+        	if(userInfo.containsKey("school")){
+        		if(!"".equals(userInfo.get("school"))){
+        			sb.append(" ,ue.school='"+userInfo.get("school")+"'");
+        		}
+        	}
+        	if(userInfo.containsKey("grade")){
+        		if(!"".equals(userInfo.get("grade"))){
+        			sb.append(" ,ue.grade='"+userInfo.get("grade")+"'");
+        		}
+        	}
+        	if(userInfo.containsKey("address")){
+        		if(!"".equals(userInfo.get("address"))){
+        			sb.append(" ,ue.address='"+userInfo.get("address")+"'");
+        		}
+        	}
+        	if(userInfo.containsKey("nickname")){
+        		if(!"".equals(userInfo.get("nickname"))){
+        			sb.append(" ,ue.nickname='"+userInfo.get("nickname")+"'");
+        		}
+        	}
+        	if(userInfo.containsKey("area")){
+        		if(!"".equals(userInfo.get("area"))){
+        			sb.append(" ,ue.area='"+userInfo.get("area")+"'");
+        		}
+        	}
+        	sb.append(" where ue.id="+userId);
+        	this.userExpandDAO.doExecuteSql(sb.toString(), new Object[]{});
+    		result.put("resultCode", "0");
+			result.put("resultMsg", "个人信息更新成功");
+			
+		} catch (Exception e) {
+			result.put("resultCode", "1");
+			result.put("resultMsg", "保存失败!");
+		}
+        
+		return result;
+	}
+
+	/**
+	 * 用户申请积分兑换商品
+	 * do*：已配置了事务控制
+	 * return 0=成功；1=不允许兑换
+	 */
+	@Override
+	public int doApplyScoreChange(Product prod,Map<String, Object> userinfo,Exchange exchangeParam) {
+		int score = prod.getScore();
+		int oldScore =(int)userinfo.get("score");
+		int  lastScore = oldScore - score;
+		if(lastScore<0 && prod.getStock()<=0){
+			return 1;
+		}
+		// 插入积分兑换商品的申请记录
+		Exchange exchange = new Exchange();
+		exchange.setUser_id((BigInteger)userinfo.get("userId"));
+		exchange.setApplytime(new Date());
+		exchange.setProductid(prod.getId());
+		exchange.setStatus(Constant.SF_WCZ);
+		exchange.setAddress(exchangeParam.getAddress());
+		exchange.setName(exchangeParam.getName());
+		exchange.setTel(exchangeParam.getTel());
+		this.exchangeDAO.save(exchange);
+		//扣减商品库存
+		this.exchangeDAO.doExecuteSqlAndNamedQuery("SQL_App_Score_2", new Object[]{prod.getId()});
+		//更新用户的当前积分
+		this.chatRoomDAO.doExecuteSqlAndNamedQuery("SQL_App_13", new Object[]{lastScore,userinfo.get("userId")});
+		//添加一条积分扣减记录
+		Score  scoreInfo = new Score();
+		scoreInfo.setIncr_score(-score);
+		scoreInfo.setNow_score(oldScore);
+		scoreInfo.setLast_score(lastScore);
+		scoreInfo.setUser_id((BigInteger)userinfo.get("userId"));
+		scoreInfo.setScore_change_type(Constant.SCORE_CHANGE_TYPE_FLOWEXCHANGE);
+		scoreInfo.setCreatetime(new Date());
+		scoreInfo.setRemark("兑换的商品ID："+prod.getId()+"；名称："+prod.getName());
+		this.scoreDAO.save(scoreInfo);
+		//更新用户会话积分
+		userinfo.put("score", lastScore);
+		return 0;
+	}
+	
+	/**
+	 * 用户申请积分兑换流量
+	 */
+	@Override
+	public int doApplyScoreChange(String info,Map<String, Object> userinfo) {
+		String [] infos = info.split(":");
+		String score = infos[0];
+		String flow = infos[1];
+		int  lastScore = (int)userinfo.get("score")- Integer.parseInt(score);
+		if(lastScore<0){
+			return -1;
+		}
+		String tel = userinfo.get("tel").toString();
+		//插入积分兑换流量的申请记录
+		this.chatRoomDAO.doExecuteSqlAndNamedQuery("SQL_App_12", new Object[]{userinfo.get("userId"),"1601",score,flow,new Date(),tel,MobileUtil.validateMobile(tel),Constant.SF_WCZ});
+		//更新用户的当前积分
+		this.chatRoomDAO.doExecuteSqlAndNamedQuery("SQL_App_13", new Object[]{lastScore,userinfo.get("userId")});
+		//添加一条积分扣减记录
+		Score  scoreInfo = new Score();
+		int oldScore =(int)userinfo.get("score");
+		scoreInfo.setIncr_score(-Integer.parseInt(score));
+		scoreInfo.setNow_score(oldScore);
+		scoreInfo.setLast_score(lastScore);
+		scoreInfo.setUser_id((BigInteger)userinfo.get("userId"));
+		scoreInfo.setScore_change_type(Constant.SCORE_CHANGE_TYPE_FLOWEXCHANGE);
+		scoreInfo.setCreatetime(new Date());
+		scoreInfo.setRemark("兑换"+flow+"流量");
+		this.scoreDAO.save(scoreInfo);
+		return lastScore;
+	}
+
+	@Override
+	public List<Map<String, Object>> findScoreChangeRecords(String userId) {
+		
+		return this.scoreDAO.findBySqlAndNamedQuery("SQL_App_14", new Object[]{userId}, new String[][] { new String[] { "createtime", "date", "yyyy-MM-dd" }});
+	}
+
+	@Override
+	public int doBrushTopic(Map<String, Object> userInfo,Map<String, Object> topicInfo) {
+		int lastScore = (int)userInfo.get("score");
+		int totalCount = Integer.parseInt(topicInfo.get("totalCount").toString());
+		int errorCount = Integer.parseInt(topicInfo.get("errorCount").toString());
+		String isnew = topicInfo.get("isnew").toString();
+		try {
+			List<Map<String, Object>> topicData = this.reportDAO.findBySqlAndNamedQuery("SQL_App_15", new Object[]{topicInfo.get("subjectId"),userInfo.get("userId")});
+			Report report = new Report();
+			report.setCourse_id(topicInfo.get("courseid")==null?"":topicInfo.get("courseid").toString());
+			report.setPaperid(topicInfo.get("paperid")==null?"":topicInfo.get("paperid").toString());
+			report.setCreatetime(new Date());
+			report.setTopic_id(topicInfo.get("subjectId")==null?"":topicInfo.get("subjectId").toString());
+			report.setTopic_name(topicInfo.get("label")==null?"":topicInfo.get("label").toString());
+			report.setImgname(topicInfo.get("imgname")==null?"":topicInfo.get("imgname").toString());
+			report.setUser_id((BigInteger)userInfo.get("userId"));
+			//添加一条积分记录
+			Score  scoreInfo = new Score();
+			int oldScore =(int)userInfo.get("score");
+			scoreInfo.setNow_score(oldScore);
+			scoreInfo.setUser_id((BigInteger)userInfo.get("userId"));
+			scoreInfo.setScore_change_type(Constant.SCORE_CHANGE_TYPE_BRUSH);
+			scoreInfo.setCreatetime(new Date());
+			scoreInfo.setRemark("刷题奖励");
+			if(errorCount==0){
+				report.setStatus(Constant.TOPIC_STATUS_RIGHT);
+				
+			}else{
+				report.setStatus(Constant.TOPIC_STATUS_ERROR);
+			}
+			if(topicData.size()==0){
+				if(errorCount==0){
+					if(Constant.TOPIC_NEW.equals(isnew)){
+							scoreInfo.setIncr_score(30*totalCount);
+							scoreInfo.setLast_score(oldScore+30*totalCount);
+							lastScore = oldScore+30*totalCount;
+					}else{
+						scoreInfo.setIncr_score(20*totalCount);
+						scoreInfo.setLast_score(oldScore+20*totalCount);
+						lastScore = oldScore+20*totalCount;
+					}
+				}else{
+					if(Constant.TOPIC_NEW.equals(isnew)){
+						scoreInfo.setIncr_score(errorCount+(totalCount-errorCount)*30);
+						scoreInfo.setLast_score(oldScore+errorCount*10+(totalCount-errorCount)*30);
+						lastScore = oldScore+errorCount*10+(totalCount-errorCount)*30;
+					}else{
+						scoreInfo.setIncr_score(errorCount+(totalCount-errorCount)*20);
+						scoreInfo.setLast_score(oldScore+(totalCount-errorCount)*20);
+						lastScore = oldScore+(totalCount-errorCount)*20;
+					}
+				}
+				this.chatRoomDAO.doExecuteSqlAndNamedQuery("SQL_App_13", new Object[]{lastScore,userInfo.get("userId")});
+				this.scoreDAO.save(scoreInfo);
+			}else{
+				if(errorCount==0){
+					this.dao.doExecuteSqlAndNamedQuery("SQL_App_26", new Object[]{userInfo.get("userId"),topicInfo.get("subjectId")});
+				}
+			}
+			this.reportDAO.save(report);
+		} catch (Exception e) {
+			// TODO: handle exception
+			throw new RuntimeException();
+		}
+		return lastScore;
+		
+	}
+
+	@Override
+	public List<Map<String, Object>> getUnCheckedStudentInfo(String tel) {
+		
+		return this.chatRoomDAO.findBySqlAndNamedQuery("SQL_App_16", new Object[]{tel});
+	}
+
+	@Override
+	public Map<String, Object> getUserOrderInfo(String userId,String startTime,String endTime) {
+		List<Map<String, Object>> data = this.dao.findBySqlAndNamedQuery("SQL_App_17", new Object[]{startTime,endTime,startTime,endTime});
+		for(int i=0;i<data.size();i++){
+			String user_id = String.valueOf(data.get(i).get("user_id"));
+			if(user_id.equals(userId)){
+				Map<String, Object> resultMap = data.get(i);
+				resultMap.put("order", i+1);
+				resultMap.put("count", data.size());
+				return resultMap;
+			}
+		}
+		return null;
+	}
+
+	@Override
+	public void doModifyUserImg(String userId, String imgUrl) {
+		try {
+			
+			this.chatRoomDAO.doExecuteSqlAndNamedQuery("SQL_App_18", new Object[]{imgUrl,userId});
+		} catch (Exception e) {
+			throw new RuntimeException();
+		}
+		
+	}
+
+	@Override
+	public Map<String, Object> findUserInfoForTeacher(String userId) {
+		
+		return this.dao.findUniqueBySqlAndNamedQuery("SQL_App_5_1", new Object[]{userId});
+	}
+
+	@Override
+	public int findTodayRightTopicCount(String userId, String startTime,
+			String endTime) {
+		
+		return this.dao.findIntBySqlAndNamedQuery("SQL_App_19", new Object[]{userId,startTime,endTime},"count");
+	}
+
+	@Override
+	public List<Map<String, Object>> getErrorTopicList(String userId,String type) {
+		List<Map<String, Object>> errorTopicList = this.reportDAO.findBySqlAndNamedQuery("SQL_App_20", new Object[]{userId});
+		return Util.cleanListByMapKey(errorTopicList, type);
+	}
+
+	@Override
+	public void saveMessage(BigInteger userId, String message,String course_id) {
+		Comment comment = new Comment();
+		comment.setCreatetime(new Date());
+		comment.setMessage(message);
+		comment.setUser_id(userId);
+		comment.setCourse_id(course_id);
+		commentDAO.save(comment);
+	}
+
+	@Override
+	public List<Map<String, Object>> loadMessageList(String course_id) {
+		return this.commentDAO.findBySqlAndNamedQuery("SQL_App_21", new Object[]{course_id}, new String[][] { new String[] { "createtime", "date", "yyyy-MM-dd HH:mm:ss" }});
+	}
+
+	@Override
+	public int getChangeScore(BigInteger userId) {
+		// TODO Auto-generated method stub
+		return this.dao.findIntBySqlAndNamedQuery("SQL_App_22", new Object[]{userId}, "total");
+	}
+
+	@Override
+	public List<Map<String, Object>> loadTopicList(String subjectId,String paperid,String userId) {
+		List<Map<String, Object>> data  = this.dao.findBySqlAndNamedQuery("SQL_App_23", new Object[]{subjectId,paperid,paperid,userId});
+		return data;
+	}
+	@Override
+	public List<Map<String, Object>> loadTopicList(String subjectId,String paperid) {
+		List<Map<String, Object>> data  = this.dao.findBySqlAndNamedQuery("SQL_App_23_1", new Object[]{subjectId,paperid});
+		return data;
+	}
+
+	@Override
+	public List<Map<String, Object>> getErrorTopicList(String userId,
+			String courseName, String type) {
+		List<Map<String, Object>> errorTopicList = this.reportDAO.findBySqlAndNamedQuery("SQL_App_24", new Object[]{userId,courseName},new String[][] { new String[] { "createtime", "date", "yyyy-MM-dd HH:mm:ss" }});
+		return Util.cleanListByMapKey(errorTopicList, type);
+	}
+
+	@Override
+	public List<Map<String, Object>> loadErrorTopicList(String subjectId) {
+		// TODO Auto-generated method stub
+		return this.dao.findBySqlAndNamedQuery("SQL_App_25", new Object[]{subjectId});
+	}
+	
+	@Override
+	public List<Map<String, Object>> listAdvertisement() {
+		// TODO Auto-generated method stub
+		return this.dao.findBySqlAndNamedQuery("SQL_All_22", new Object[]{});
+	}
+
+	@Override
+	public List<Map<String, Object>> getSchoolInfos(String code, String city) {
+		if("".equals(code)){
+			return Util.cleanDataBySchool(this.dao.findBySqlAndNamedQuery("SQL_All_26", new Object[]{city}));
+		}else if("".equals(city)){
+			return  Util.cleanDataBySchool(this.dao.findBySqlAndNamedQuery("SQL_All_25", new Object[]{code}));
+		}else{
+			List<Map<String, Object>> artSchool = this.dao.findBySqlAndNamedQuery("SQL_All_25", new Object[]{code});
+			List<Map<String, Object>> citySchool = this.dao.findBySqlAndNamedQuery("SQL_All_26", new Object[]{city});
+			List<Map<String, Object>> resultList = new ArrayList<>();
+			for(int i=0;i<artSchool.size();i++){
+				for(int j=0;j<citySchool.size();j++){
+					if(artSchool.get(i).get("id").equals(citySchool.get(j).get("id"))){
+						resultList.add(artSchool.get(i));
+					}
+				}
+			}
+			return  Util.cleanDataBySchool(resultList);
+		}
+	}
+
+	@Override
+	public Map<String, Object> getIntroductionInfo(String type) {
+
+		return this.dao.findUniqueBySqlAndNamedQuery("SQL_All_27", new Object[]{type});
+	}
+
+	@Override
+	public boolean isExistTopicInReport(Map<String, Object> topicInfo,Map<String, Object> userInfo) {
+		List<Map<String, Object>> data = this.dao.findBySqlAndNamedQuery("SQL_App_Topic_1", new Object[]{userInfo.get("userId"),topicInfo.get("subjectId")});
+		if(data.size()>0){
+			return true;
+		}
+		return false;
+	}
+
+	@Override
+	public List<Map<String, Object>> getTotalTodayBySubject(String subJectId,
+			BigInteger userId) {
+		List<Map<String, Object>> data = this.dao.findBySqlAndNamedQuery("SQL_App_Topic_2", new Object[]{subJectId,userId,DateCommonUtils.getTheDate()+" 00:00:00",DateCommonUtils.getTheDate()+" 23:59:59"});
+		return data;
+	}
+}

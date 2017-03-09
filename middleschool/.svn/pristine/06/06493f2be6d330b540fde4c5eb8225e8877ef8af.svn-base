@@ -1,0 +1,21 @@
+var fields={
+		"grid_title":"用户列表",
+		"grid_operate":"操作",
+		"user_no":"序号",
+		"user_username":"用 户 名",
+		"user_password":"密    码",
+		"user_password_confirm":"确认密码",
+		"user_enabled":"是否激活",
+		"user_locked":"是否锁住",
+		"user_account_expried":"账号过期",
+		"user_credentials_expired":"认证过期",
+		"boolean_yes":"是",
+		"boolean_no":"否",
+		"operate_save":"保存",
+		"operate_clean":"清除",
+		"user_create_time":"创建时间",
+		"user_creater":"创建人",
+		"user_password_reset":"重置密码",
+		"edit_user_password_win_title":"修改密码",
+		"user_delete":"删除用户"
+};

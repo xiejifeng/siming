@@ -1,0 +1,494 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+	<sql-query name="SQL_App_1">
+     <![CDATA[
+		SELECT
+			ue.*,
+			su.username,
+			su.`password`,
+			su.account_non_expired,
+			su.account_non_locked,
+			su.credentials_non_expired
+		FROM
+			sys_user su,
+			user_expand ue
+		WHERE
+			1 = 1
+		AND su.id = ue.userId
+		AND su.account_non_expired = 0
+		AND (
+			su.username = ?
+			OR ue.tel = ?
+		)     
+     ]]>
+	</sql-query>
+	
+	<sql-query name="SQL_App_2">
+     <![CDATA[
+		SELECT
+			sd.`code` AS id,
+			sd.text AS 'value'
+		FROM
+			sys_dictionary sd
+		WHERE
+			sd.category = ?   
+     ORDER BY sd.priority ASC  
+     ]]>
+	</sql-query>
+	
+	<sql-query name="SQL_App_3">
+     <![CDATA[
+		SELECT
+			ue.userId,
+			su.username
+		FROM
+			user_expand ue,
+			sys_user su
+		WHERE
+			1 = 1
+		AND su.id = ue.userId
+		AND ue.tel = ?
+     ]]>
+	</sql-query>
+	
+	<sql-query name="SQL_App_4">
+     <![CDATA[
+		SELECT
+			DATE_FORMAT(s.signtime, '%Y-%m-%d') AS signtime,
+			course_name
+		FROM
+			sign s
+		WHERE
+			1 = 1
+		AND s.user_id = ?
+    ORDER BY s.signtime DESC LIMIT 10
+     ]]>
+	</sql-query>
+	
+	<sql-query name="SQL_App_5">
+     <![CDATA[
+		SELECT
+			ue.*
+		FROM
+			user_expand ue
+		WHERE
+			1 = 1
+		AND ue.userId = ?
+     ]]>
+	</sql-query>
+	
+	<sql-query name="SQL_App_5_1">
+     <![CDATA[
+		SELECT
+			a.*, sdic.text AS tschoolname
+		FROM
+			(
+				SELECT
+							ue.*, sd.text AS cityname
+						FROM
+							user_expand ue,
+							sys_dictionary sd
+						WHERE
+							1 = 1
+						AND ue.userId = ?
+						AND sd.`code` = ue.city
+			) a,
+			sys_dictionary sdic
+		WHERE
+			sdic. CODE = a.tschool
+     ]]>
+	</sql-query>
+	
+	<sql-query name="SQL_App_6">
+     <![CDATA[
+		SELECT
+			ue.userId,
+			ue.`name`,
+			ue.tel,
+			DATE_FORMAT(ue.insertDate, '%Y-%m-%d') AS applytime
+		FROM
+			sys_user su,
+			user_expand ue
+		WHERE
+			su.id = ue.userId
+		AND su.account_non_locked = 0
+		AND ue.`status` = 1701
+    AND ue.tschool = ?
+     ]]>
+	</sql-query>
+	
+	<sql-query name="SQL_App_7">
+     <![CDATA[
+		UPDATE user_expand ue
+		SET ue.`status` = ?
+		WHERE
+			ue.userId IN (?)
+     ]]>
+	</sql-query>
+	
+	<sql-query name="SQL_App_8">
+     <![CDATA[
+		SELECT
+			*
+		FROM
+			sign s
+		WHERE
+			s.user_id = ?
+		AND s.course_id = ?
+     ]]>
+	</sql-query>
+	
+	<sql-query name="SQL_App_9">
+     <![CDATA[
+		SELECT
+			*
+		FROM
+			chatroom cr
+		WHERE
+			`status` = 0
+		AND cr.targetId = ?
+     ]]>
+	</sql-query>
+	
+	<sql-query name="SQL_App_10">
+     <![CDATA[
+		UPDATE user_expand ue
+		SET ue.score = ue.score + 100
+		WHERE
+			ue.userId = ?
+     ]]>
+	</sql-query>
+	
+	<sql-query name="SQL_App_11">
+     <![CDATA[
+		SELECT
+			sd.`code`,
+			sd.text,
+			sd.keyword
+		FROM
+			sys_dictionary sd
+		WHERE
+			sd.category = ? 
+		ORDER BY sd.priority ASC    
+
+     ]]>
+	</sql-query>
+	
+	<sql-query name="SQL_App_12">
+     <![CDATA[
+		INSERT INTO flow_exchange (
+			`user_id`,
+			`user_type`,
+			`exchange_score`,
+			`exchange_flow`,
+			`applytime`,
+			`user_tel`,
+			`operators`,
+			`type`
+		)
+		VALUES
+			(?,?,?,?,?,?,?,?);
+     ]]>
+	</sql-query>
+	
+	<sql-query name="SQL_App_13">
+     <![CDATA[
+		UPDATE user_expand ue
+		SET ue.score =?
+		WHERE
+			ue.userId =?
+     ]]>
+	</sql-query>
+	
+	<sql-query name="SQL_App_14">
+     <![CDATA[
+		SELECT
+		    *
+		FROM
+			score s
+		WHERE
+			s.user_id = ?
+		ORDER BY s.createtime DESC
+     ]]>
+	</sql-query>
+	
+	<sql-query name="SQL_App_15">
+     <![CDATA[
+		SELECT
+			*
+		FROM
+			report re
+		WHERE
+			1 = 1
+		AND re.topic_id =?
+		AND re.user_id = ?
+     ]]>
+	</sql-query>
+	
+	<sql-query name="SQL_App_16">
+     <![CDATA[
+		SELECT
+			su.*
+		FROM
+			sys_user su,
+			user_expand ue
+		WHERE
+			1 = 1
+		AND su.id = ue.userId
+		AND su.account_non_expired = 0
+		AND su.account_non_locked = 0
+		AND ue.`status` = '1701'
+		AND ue.teacher_tel =?
+     ]]>
+	</sql-query>
+	<sql-query name="SQL_App_17">
+    <![CDATA[
+SELECT
+		c.*, LEFT (
+			(c.righttotal / c.total) * 100,
+			5
+		) AS week_accuracy
+	FROM
+		(
+			SELECT
+				a.*, b.righttotal
+			FROM
+				(
+					SELECT
+						COUNT(a.user_id) AS total,
+						a.user_id
+					FROM
+						(
+							SELECT
+								*
+							FROM
+								report re
+							WHERE
+								1 = 1
+							AND re.createtime > ?
+							AND re.createtime < ?
+						) a
+					WHERE
+						1 = 1
+					GROUP BY
+						a.user_id
+				) a,
+				(
+					SELECT
+						COUNT(a.user_id) AS righttotal,
+						a.user_id
+					FROM
+						(
+							SELECT
+								*
+							FROM
+								report re
+							WHERE
+								1 = 1
+							AND re.`status` = '1D00'
+							AND re.createtime > ?
+							AND re.createtime < ?
+						) a
+					WHERE
+						1 = 1
+					GROUP BY
+						a.user_id
+				) b
+			WHERE
+				1 = 1
+			AND a.user_id = b.user_id
+		) c,
+		user_expand ue
+	WHERE
+		1 = 1
+	AND ue.userId = c.user_id
+	ORDER BY
+		week_accuracy DESC,righttotal DESC
+    ]]>
+</sql-query>
+
+
+<sql-query name="SQL_App_18">
+    <![CDATA[
+	UPDATE user_expand ue
+	SET ue.img =?
+	WHERE
+		ue.userId =? 
+    ]]>
+</sql-query>
+
+<sql-query name="SQL_App_19">
+    <![CDATA[
+		SELECT
+			COUNT(*) AS count
+		FROM
+			report re
+		WHERE
+			1 = 1
+		AND re.user_id = ?
+		AND re.`status` = '1D00'
+		AND re.createtime > ?
+		AND re.createtime < ?
+    ]]>
+</sql-query>
+
+<sql-query name="SQL_App_20">
+    <![CDATA[
+	SELECT
+		*
+	FROM
+		report re
+	WHERE
+		re.user_id = ?
+	ORDER BY  re.createtime DESC
+    ]]>
+</sql-query>
+
+<sql-query name="SQL_App_21">
+    <![CDATA[
+		SELECT
+			c.*, ue.img,
+			ue.`nickname`
+		FROM
+			`comment` c,
+			user_expand ue
+		WHERE
+			ue.userId = c.user_id
+		AND c.course_id =?
+		ORDER BY
+			c.createtime DESC
+    ]]>
+</sql-query>
+
+<sql-query name="SQL_App_22">
+    <![CDATA[
+	SELECT
+		SUM(fe.exchange_score) as total
+	FROM
+		flow_exchange fe
+	WHERE
+		fe.user_id = ?
+    ]]>
+</sql-query>
+
+<sql-query name="SQL_App_23">
+    <![CDATA[
+SELECT
+	*
+FROM
+	topicbank tb
+WHERE
+	tb.SubjectId = ?
+AND tb.paperid = ?
+AND tb.Qid NOT IN (
+	SELECT
+		r.topic_id
+	FROM
+		report r
+	WHERE
+		r.paperid = ?
+	AND r.user_id = ?
+)
+    ]]>
+</sql-query>
+<sql-query name="SQL_App_23_1">
+    <![CDATA[
+	SELECT
+		*
+	FROM
+		topicbank tb
+	WHERE
+		tb.SubjectId = ?
+	AND tb.paperid = ?
+    ]]>
+</sql-query>
+
+<sql-query name="SQL_App_24">
+    <![CDATA[
+	SELECT
+		*
+	FROM
+		report re
+	WHERE
+		re.user_id = ?
+	AND re.course_id = ?
+	ORDER BY  re.createtime DESC
+    ]]>
+</sql-query>
+
+<sql-query name="SQL_App_25">
+    <![CDATA[
+	SELECT
+		*
+	FROM
+		topicbank tb
+	WHERE
+		tb.Qid = ?
+    ]]>
+</sql-query>
+
+<sql-query name="SQL_App_26">
+    <![CDATA[
+	DELETE
+	FROM
+		report 
+	WHERE
+		user_id =?
+	AND topic_id =?
+    ]]>
+</sql-query>
+
+<sql-query name="SQL_App_27">
+    <![CDATA[
+		SELECT
+			COUNT(*) as total
+		FROM
+			report re
+		WHERE
+			re.course_id = ?
+		AND re.createtime < ?
+		AND re.createtime > ?
+		AND re.user_id = ?
+    ]]>
+</sql-query>
+<sql-query name="SQL_App_Score_1">
+    <![CDATA[
+		select p.* from product p where 
+		p.stock>0 and status='1J00' order by createtime desc
+    ]]>
+</sql-query>
+<sql-query name="SQL_App_Score_2">
+     <![CDATA[
+		UPDATE product 
+		SET stock =stock-1
+		WHERE
+			id =?
+     ]]>
+</sql-query>
+<sql-query name="SQL_App_Topic_1">
+     <![CDATA[
+SELECT
+	*
+FROM
+	report r
+WHERE
+	r.user_id =?
+AND r.topic_id =?
+     ]]>
+</sql-query>
+<sql-query name="SQL_App_Topic_2">
+     <![CDATA[
+SELECT
+	*
+FROM
+	report r
+WHERE
+	r.course_id = ?
+AND r.user_id = ?
+AND r.createtime >= ?
+AND r.createtime <= ?
+     ]]>
+</sql-query>
+</hibernate-mapping>

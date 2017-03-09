@@ -1,0 +1,20 @@
+#\u6a21\u677f\u6587\u4ef6
+classes.dir = D:/tools/source/txb/build/classes
+#\u9879\u76ee\u6e90\u7801\u8def\u5f84
+src.dir = D:/tools/source/txb/src/busi/
+#web-root\u6587\u4ef6\u8def\u5f84
+webroot.dir = D:/tools/source/txb/WebContent
+#ldm\u6587\u4ef6\u8def\u5f84
+#ldm.dir = d:/source/workspace4/framework/05_RD&TS&PI&VER&VAL/3_MK/SQL_SCRIPT/SRP_DS.ldm
+#pdm\u6587\u4ef6\u8def\u5f84
+#pdm.dir = d:/source/workspace4/framework/05_RD&TS&PI&VER&VAL/3_MK/SQL_SCRIPT/SRP_DS.pdm
+#\u6570\u636e\u5e93\u9a71\u52a8\u8bbe\u7f6e
+jdbc.driverClassName = com.mysql.jdbc.Driver
+jdbc.url = jdbc:mysql://192.168.18.87:3306/txb?characterEncoding=UTF-8
+jdbc.username = root
+jdbc.password = root
+jdbc.databaseName = txb
+
+#\u53bb\u9664\u8868\u524d\u7f00
+#table.prefix = sys
+table.name = OptHis

@@ -1,0 +1,17 @@
+app.login.username=\u7528\u6237\u540d
+app.login.button.login=\u767b\u5f55
+app.login.title=\u601d\u660e\u6559\u80b2\u540e\u53f0\u7ba1\u7406\u7cfb\u7edf
+app.login.logo=\u601d\u660e\u6559\u80b2\u540e\u53f0\u7ba1\u7406\u7cfb\u7edf
+app.login.window.title=\u767b\u5f55\u7a97\u53e3
+app.login.password=\u5bc6\u7801
+app.login.captchacode=\u9a8c\u8bc1\u7801
+app.login.captcha=\u770b\u4e0d\u6e05,\u6362\u4e00\u5f20
+app.login.box.title=\u767b\u5f55\u5230\u60a8\u7684\u5e10\u6237
+app.login.loginnow=\u7acb\u5373\u767b\u5f55
+app.login.peojectname=\u601d\u660e\u6559\u80b2
+app.login.welcome=\u6b22\u8fce\u60a8 
+app.login.input.username=\u8bf7\u8f93\u5165\u7528\u6237\u540d
+app.login.input.password=\u8bf7\u8f93\u5165\u5bc6\u7801
+app.login.info1=\u7528\u6700\u7b80\u5355\u7684\u65b9\u5f0f\u7ba1\u7406\u7cfb\u7edf
+app.login.info2=\u6570\u636e\u3001\u56fe\u8868\u3001\u6587\u4ef6\u3001\u94fe\u63a5\u548c\u66f4\u591a...
+app.login.update.password=\u4fee\u6539\u5bc6\u7801

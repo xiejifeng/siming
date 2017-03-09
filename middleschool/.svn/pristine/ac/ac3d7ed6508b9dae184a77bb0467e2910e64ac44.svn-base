@@ -1,0 +1,844 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+	<sql-query name="SQL_All_1">
+     <![CDATA[
+        SELECT lr.*,ue.tel,ue.`name`,ue.nickname FROM sys_user su,login_record lr,user_expand ue WHERE su.id = lr.user_id AND ue.userId = su.id
+     	/**<#if (tel??) && (tel?trim != "")>**/
+   		   and ue.tel like  ?
+   		/**</#if>**/
+   		/**<#if (startTime??) && (startTime?trim != "")>**/
+   		and lr.login_time >=  ?
+   		/**</#if>**/
+   		/**<#if (endTime??) && (endTime?trim != "")>**/
+   		and lr.login_time <=  ?
+   		/**</#if>**/
+ 		ORDER BY lr.id , lr.login_time desc
+     ]]>
+	</sql-query>
+
+	<sql-query name="SQL_All_2">
+		<![CDATA[
+				SELECT
+			a.*, sdic.text AS tschoolname
+		FROM
+			(
+				SELECT
+					t.*, dic.text AS artname
+				FROM
+					(
+						SELECT
+					tt.*,
+					sd.text AS cityname
+				FROM
+					(
+						SELECT
+							s.username,
+							u.* 
+						FROM
+							sys_user s,
+							user_expand u 
+						WHERE
+							1 = 1
+						AND s.id = u.userId
+						AND s.account_non_expired = 0
+						AND s.account_non_locked = 0
+					/**<#if (tel??) && (tel?trim != "")>**/
+			   		   and u.tel like  :tel
+			   		/**</#if>**/
+					/**<#if (school??) && (school?trim != "")>**/
+			   		   and u.school like   :school
+			   		/**</#if>**/
+					/**<#if (referee??) && (referee?trim != "")>**/
+			   		   and u.referee like  :referee
+			   		/**</#if>**/
+					/**<#if (grade??) && (grade?trim != "")>**/
+			   		   and u.grade like  :grade
+			   		/**</#if>**/
+					/**<#if (cityorqx??) && (cityorqx?trim != "")>**/
+			   		   and u.city = :cityorqx 
+			   		/**</#if>**/
+					/**<#if (arttype??) && (arttype?trim != "")>**/
+			   		   and u.arttype =  :arttype
+			   		/**</#if>**/
+					/**<#if (tschool??) && (tschool?trim != "")>**/
+			   		   and u.tschool =  :tschool
+			   		/**</#if>**/
+					/**<#if (status??) && (status?trim != "")>**/
+			   		   and u.status =  :status
+			   		/**</#if>**/
+			   		 ) tt
+				     LEFT JOIN sys_dictionary sd ON tt.city = sd.`code`
+					) t LEFT JOIN 
+					sys_dictionary dic
+				ON
+					t.arttype = dic.`code`
+			) a LEFT JOIN 
+			sys_dictionary sdic
+		ON
+			a.tschool = sdic.`code`
+			      
+		]]>
+	</sql-query>
+		
+	<sql-query name="SQL_All_3">
+     <![CDATA[
+SELECT
+	t.*, sd.text AS statusname
+FROM
+	(
+		SELECT
+			p.`name` AS pname,
+			p.score,
+			e.*
+		FROM
+			product p,
+			exchange e
+		WHERE
+			1 = 1
+		AND e.product_id = p.id
+		/**<#if (tel??) && (tel?trim != "")>**/
+		and e.tel like  :tel
+		/**</#if>**/
+		/**<#if (username??) && (username?trim != "")>**/
+		and e.name like  :username
+		/**</#if>**/
+		/**<#if (status??) && (status?trim != "")>**/
+		and e.status =  :status
+		/**</#if>**/
+		/**<#if (startTime??) && (startTime?trim != "")>**/
+		and e.applytime >=  :startTime
+		/**</#if>**/
+		/**<#if (endTime??) && (endTime?trim != "")>**/
+		and e.applytime <=  :endTime
+		/**</#if>**/
+	) t
+LEFT JOIN sys_dictionary sd ON t. STATUS = sd.`code`
+     ]]>
+	</sql-query>
+	
+	<sql-query name="SQL_All_4">
+     <![CDATA[
+        SELECT f.*,ue.tel,ue.nickname,su.username FROM sys_user su,user_expand ue,feedback f WHERE su.id = ue.userId AND ue.userId = f.user_id
+   		/**<#if (startTime??) && (startTime?trim != "")>**/
+   		and f.createtime >=  ?
+   		/**</#if>**/
+   		/**<#if (endTime??) && (endTime?trim != "")>**/
+   		and f.createtime <=  ?
+   		/**</#if>**/
+ 		ORDER BY f.id ,f.createtime desc
+     ]]>
+	</sql-query>
+	
+	<sql-query name="SQL_All_5">
+		<![CDATA[
+			     SELECT
+		a.*, sdic.text AS tschoolname
+	FROM
+		(
+			SELECT
+				t.*,
+				dic.text AS cityname
+			FROM
+				(
+					SELECT
+						s.username,
+						u.*, sd.text AS statusname
+					FROM
+						sys_user s,
+						user_expand u,
+						sys_dictionary sd
+					WHERE
+						1 = 1
+					AND s.id = u.userId
+					AND s.account_non_expired = 0
+					AND s.account_non_locked = 1
+					AND u.`status` = sd.`code`
+				/**<#if (tel??) && (tel?trim != "")>**/
+		   		   and u.tel like  :tel
+		   		/**</#if>**/
+				/**<#if (status??) && (status?trim != "")>**/
+		   		   and u.status =   :status
+		   		/**</#if>**/
+				/**<#if (cityorqx??) && (cityorqx?trim != "")>**/
+		   		   and u.city = :cityorqx  
+		   		/**</#if>**/
+				/**<#if (tschool??) && (tschool?trim != "")>**/
+		   		   and u.tschool like = tschool
+		   		/**</#if>**/
+				) t,
+				sys_dictionary dic
+			WHERE
+				t.city = dic.`code`
+		) a,
+		sys_dictionary sdic
+	WHERE
+		sdic.`code` = a.tschool			    
+		]]>
+	</sql-query>
+	
+	<sql-query name="SQL_All_6">
+     <![CDATA[
+     	update  user_expand set status = ? where userId = ?
+     ]]>
+	</sql-query>
+	
+	<sql-query name="SQL_All_7">
+     <![CDATA[
+	SELECT
+		fe.*,
+		p.`name` AS pname,
+		p.score
+	FROM
+		exchange fe,
+		user_expand ue,
+		product p
+	WHERE
+		ue.userId = fe.user_id
+	AND	p.id = fe.product_id
+	AND fe. STATUS = '1500'
+		AND fe.id IN (/**<#list userids as userid>?<#if userid_has_next>,</#if></#list>**/)
+	
+     ]]>
+	</sql-query>
+	
+	<sql-query name="SQL_All_8">
+     <![CDATA[
+         update  exchange set status = ?,exporttime = NOW() where id = ?
+     ]]>
+	</sql-query>
+	<sql-query name="SQL_All_9">
+     <![CDATA[
+				SELECT
+			a.*, sdic.text AS tschoolname
+		FROM
+			(
+				SELECT
+					t.*, dic.text AS gradename
+				FROM
+					(
+				SELECT
+					tt.*,
+					sd.text AS areaname
+				FROM
+					(
+						SELECT
+							s.username,
+							u.* 
+						FROM
+							sys_user s,
+							user_expand u 
+						WHERE
+							1 = 1
+						AND s.id = u.userId
+						AND s.account_non_expired = 0
+						AND s.account_non_locked = 0
+					/**<#if (tel??) && (tel?trim != "")>**/
+			   		   and u.tel like  :tel
+			   		/**</#if>**/
+					/**<#if (grade??) && (grade?trim != "")>**/
+			   		   and u.grade =  :grade
+			   		/**</#if>**/
+					/**<#if (cityorqx??) && (cityorqx?trim != "")>**/
+			   		   and u.area = :cityorqx 
+			   		/**</#if>**/
+					/**<#if (username??) && (username?trim != "")>**/
+			   		   and u.username =  :username
+			   		/**</#if>**/
+					/**<#if (tschool??) && (tschool?trim != "")>**/
+			   		   and u.school =  :tschool
+			   		/**</#if>**/
+					/**<#if (status??) && (status?trim != "")>**/
+			   		   and u.status =  :status
+			   		/**</#if>**/
+						/**<#if (startTime??) && (startTime?trim != "")>**/
+						and u.insertDate >=  :startTime
+						/**</#if>**/
+						/**<#if (endTime??) && (endTime?trim != "")>**/
+						and u.insertDate <=  :endTime
+						/**</#if>**/
+			   		) tt
+			        	LEFT JOIN sys_dictionary sd ON tt.area = sd.`code` 
+			 		) t LEFT JOIN 
+					sys_dictionary dic
+				ON
+					t.grade = dic.`code`
+			) a LEFT JOIN 
+			sys_dictionary sdic
+		ON
+			a.school = sdic.`code`
+     ]]>
+	</sql-query>
+	
+	<sql-query name="SQL_All_10">
+     <![CDATA[
+	     SELECT
+		a.*, sdic.text AS tschoolname
+	FROM
+		(
+			SELECT
+				t.*,
+				dic.text AS cityname
+			FROM
+				(
+					SELECT
+						s.username,
+						u.*, sd.text AS statusname
+					FROM
+						sys_user s,
+						user_expand u,
+						sys_dictionary sd
+					WHERE
+						1 = 1
+					AND s.id = u.userId
+					AND s.account_non_expired = 0
+					AND s.account_non_locked = 1
+					AND u.`status` = sd.`code`
+				/**<#if (tel??) && (tel?trim != "")>**/
+		   		   and u.tel like  :tel
+		   		/**</#if>**/
+				/**<#if (status??) && (status?trim != "")>**/
+		   		   and u.status =   :status
+		   		/**</#if>**/
+				/**<#if (cityorqx??) && (cityorqx?trim != "")>**/
+		   		   and (u.city like :cityorqx  or u.qx like :cityorqx)
+		   		/**</#if>**/
+				/**<#if (tschool??) && (tschool?trim != "")>**/
+		   		   and u.tschool like  :tschool
+		   		/**</#if>**/
+				) t,
+				sys_dictionary dic
+			WHERE
+				t.city = dic.`code`
+		) a,
+		sys_dictionary sdic
+	WHERE
+		sdic.`code` = a.tschool
+     ]]>
+	</sql-query>
+	
+ <sql-query name="SQL_All_11">
+     <![CDATA[
+SELECT
+	t_all.*,t_all.accuracy as id, 
+    IFNULL(t_week.week_accuracy,0)as week_accuracy,
+	IFNULL(t_week.total,0) AS week_total,
+	IFNULL(t_week.righttotal,0) AS week_righttotal
+FROM
+	(
+		SELECT
+			c.*, ue.tel,
+			ue.`name`,
+			ue.nickname,
+			LEFT (
+				(c.righttotal / c.total) * 100,
+				5
+			) AS accuracy
+		FROM
+			(
+				SELECT
+					a.*, b.righttotal
+				FROM
+					(
+						SELECT
+							re.user_id,
+							COUNT(re.user_id) AS total
+						FROM
+							report re
+						WHERE
+							1 = 1
+						GROUP BY
+							re.user_id
+					) a,
+					(
+						SELECT
+							COUNT(a.user_id) AS righttotal,
+							a.user_id
+						FROM
+							(
+								SELECT
+									*
+								FROM
+									report re
+								WHERE
+									1 = 1
+								AND re.`status` = '1D00'
+							) a
+						WHERE
+							1 = 1
+						GROUP BY
+							a.user_id
+					) b
+				WHERE
+					1 = 1
+				AND a.user_id = b.user_id
+			) c,
+			user_expand ue
+		WHERE
+			1 = 1
+		AND ue.userId = c.user_id
+		ORDER BY
+			accuracy DESC
+	) t_all LEFT JOIN
+	(
+		SELECT
+			c.*, LEFT (
+				(c.righttotal / c.total) * 100,
+				5
+			) AS week_accuracy
+		FROM
+			(
+				SELECT
+					a.*, b.righttotal
+				FROM
+					(
+						SELECT
+							COUNT(a.user_id) AS total,
+							a.user_id
+						FROM
+							(
+								SELECT
+									*
+								FROM
+									report re
+								WHERE
+									1 = 1
+								AND re.createtime > :startTime
+								AND re.createtime < :endTime
+							) a
+						WHERE
+							1 = 1
+						GROUP BY
+							a.user_id
+					) a,
+					(
+						SELECT
+							COUNT(a.user_id) AS righttotal,
+							a.user_id
+						FROM
+							(
+								SELECT
+									*
+								FROM
+									report re
+								WHERE
+									1 = 1
+								AND re.`status` = '1D00'
+								AND re.createtime > :startTime
+								AND re.createtime < :endTime
+							) a
+						WHERE
+							1 = 1
+						GROUP BY
+							a.user_id
+					) b
+				WHERE
+					1 = 1
+				AND a.user_id = b.user_id
+			) c,
+			user_expand ue
+		WHERE
+			1 = 1
+		AND ue.userId = c.user_id
+		ORDER BY
+			week_accuracy DESC
+	) t_week ON
+	1 = 1
+AND t_all.user_id = t_week.user_id
+/**<#if (tel??) && (tel?trim != "")>**/
+ 		   and t_all.tel like  :tel
+/**</#if>**/
+ORDER BY t_all.accuracy+0 DESC
+     ]]>
+ </sql-query>
+ 
+<sql-query name="SQL_All_12">
+   <![CDATA[
+	UPDATE exchange fe
+	SET fe.status = ?
+	WHERE
+		fe.id =?
+    ]]>
+</sql-query>
+
+<sql-query name="SQL_All_13">
+   <![CDATA[
+UPDATE user_expand ue
+SET ue.score = ue.score +?
+WHERE
+	ue.userId = ?
+    ]]>
+</sql-query>
+<sql-query name="SQL_All_14">
+   <![CDATA[
+		SELECT
+			re.*, ue.tel,
+			ue.`name`,
+			ue.nickname,
+			sd.text AS statusname
+		FROM
+			report re,
+			user_expand ue,
+			sys_dictionary sd
+		WHERE
+			re.user_id = ue.userId
+		AND re.`status` = sd.`code`
+	/**<#if (tel??) && (tel?trim != "")>**/
+ 		   and ue.tel like  :tel
+	/**</#if>**/
+	/**<#if (username??) && (username?trim != "")>**/
+ 		   and ue.name like  :username
+	/**</#if>**/
+	/**<#if (subject??) && (subject?trim != "")>**/
+	 	   and re.course_id = :subject
+	/**</#if>**/
+	/**<#if (status??) && (status?trim != "")>**/
+	 	   and re.status = :status
+	/**</#if>**/
+	/**<#if (startTime??) && (startTime?trim != "")>**/
+	      and re.createtime >=  :startTime
+	/**</#if>**/
+	/**<#if (endTime??) && (endTime?trim != "")>**/
+	      and re.createtime <=  :endTime
+	/**</#if>**/
+    ]]>
+</sql-query>
+
+<sql-query name="SQL_All_15">
+	<![CDATA[
+		delete from user_expand where userId = ?
+	]]>
+</sql-query>
+
+<sql-query name="SQL_All_16">
+	<![CDATA[
+		delete from sys_user where id = ?
+	]]>
+</sql-query>
+
+<sql-query name="SQL_All_17">
+	<![CDATA[
+		SELECT tb.id,tb.Qid FROM topicbank tb 
+	]]>
+</sql-query>
+
+<sql-query name="SQL_All_18">
+	<![CDATA[
+			SELECT
+		tb.SubjectId
+	FROM
+		topicbank tb
+	GROUP BY
+		tb.SubjectId
+	]]>
+</sql-query>
+
+<sql-query name="SQL_All_19">
+	<![CDATA[
+	SELECT
+		tb.Qid
+	FROM
+		topicbank tb
+	WHERE
+		tb.SubjectId = ?
+	AND tb.`status` = '0'
+	LIMIT ?
+	]]>
+</sql-query>
+
+<sql-query name="SQL_All_20">
+	<![CDATA[
+UPDATE topicbank
+SET STATUS = '1'
+WHERE Qid = ?
+	]]>
+</sql-query>
+
+<sql-query name="SQL_All_21">
+	<![CDATA[
+SELECT
+	a.*, sd.text
+FROM
+	advertisement a,
+	sys_dictionary sd
+WHERE
+	a.`status` = sd.`code`
+	]]>
+</sql-query>
+
+<sql-query name="SQL_All_22">
+	<![CDATA[
+SELECT
+	a.img_url as img,
+	a.click_url,
+	a.keeptime
+FROM
+	advertisement a,
+	sys_dictionary sd
+WHERE
+	a.`status` = sd.`code`
+AND a.`status` ='1J00'
+ORDER BY a.priority DESC
+LIMIT 3
+	]]>
+</sql-query>
+
+<sql-query name="SQL_All_23">
+	<![CDATA[
+		SELECT
+			e.*
+		FROM
+			(
+				SELECT
+					c.*, sdic.text AS statusname
+				FROM
+					(
+						SELECT
+							a.*, dic.text AS schoolname
+						FROM
+							(
+								SELECT
+									tsa.*, sd.text AS areaname
+								FROM
+									schart tsa
+								LEFT JOIN sys_dictionary sd ON tsa.area_id = sd.`code`
+							) a
+						LEFT JOIN sys_dictionary dic ON a.school_id = dic. CODE
+					) c
+				LEFT JOIN sys_dictionary sdic ON c. STATUS = sdic. CODE
+			) e
+
+WHERE
+	1 = 1
+/**<#if (school_id??) && (school_id?trim != "")>**/
+		and e.school_id= :school_id
+/**</#if>**/
+/**<#if (area_id??) && (area_id?trim != "")>**/
+		and e.area_id= :area_id
+/**</#if>**/
+/**<#if (status??) && (status?trim != "")>**/
+		and e.status= :status
+/**</#if>**/
+ORDER BY
+	e.priority DESC
+	]]>
+</sql-query>
+<sql-query name="SQL_All_24">
+	<![CDATA[
+     delete from schart where id = ?
+	]]>
+</sql-query>
+<sql-query name="SQL_All_25">
+	<![CDATA[
+	SELECT
+		s.school_id AS id,
+		sd.text AS
+	value
+	
+	FROM
+		schart s,
+		sys_dictionary sd
+	WHERE
+		s.school_id = sd. CODE
+	AND s.arttype_id = ?
+	   ORDER BY s.priority DESC
+	]]>
+</sql-query>
+<sql-query name="SQL_All_26">
+	<![CDATA[
+	SELECT
+		s.school_id AS id,
+		sd.text AS
+	value
+	
+	FROM
+		schart s,
+		sys_dictionary sd
+	WHERE
+		s.school_id = sd. CODE
+	AND s.area_id = ?
+	   ORDER BY s.priority DESC
+	]]>
+</sql-query>
+
+<sql-query name="SQL_All_27">
+	<![CDATA[
+SELECT
+	s.content
+FROM
+	introduction s
+WHERE
+	s. STATUS =?
+	]]>
+</sql-query>
+
+<sql-query name="SQL_All_28">
+	<![CDATA[
+SELECT
+	*
+FROM
+	introduction 
+	]]>
+</sql-query>
+<sql-query name="SQL_All_29">
+	<![CDATA[
+SELECT a.`code` from (SELECT
+ substring(sd.`code`,3) as `code`
+FROM
+	sys_dictionary sd
+WHERE
+	sd.category = "1A"
+ORDER BY
+	sd.`code` DESC) a ORDER BY a.`code`+0 DESC LIMIT 1
+	]]>
+</sql-query>
+
+<sql-query name="SQL_All_30">
+	<![CDATA[
+INSERT INTO sys_dictionary (
+	CODE,
+	text,
+	category,
+	association,
+	system_level,
+	enabled,
+	remark,
+	priority,
+	keyword
+)
+VALUES
+	(
+		?, ?, '1A',
+		NULL,
+		'1',
+		'1',
+		'培训学校',
+		'0',
+		''
+	)
+	]]>
+</sql-query>
+
+<sql-query name="SQL_All_31">
+SELECT
+	b.*
+FROM
+	(
+		SELECT
+			c.*, sdic.text AS statusname
+		FROM
+			(
+				SELECT
+					a.*, dic.text AS schoolname
+				FROM
+					(
+						SELECT
+							tsa.*, sd.text AS areaname
+						FROM
+							schart tsa
+						LEFT JOIN sys_dictionary sd ON tsa.area_id = sd.`code`
+					) a
+				LEFT JOIN sys_dictionary dic ON a.school_id = dic. CODE
+			) c
+		LEFT JOIN sys_dictionary sdic ON c. STATUS = sdic. CODE
+	) b
+WHERE
+	b.id = ?
+</sql-query>
+
+<sql-query name="SQL_All_32">
+UPDATE schart
+SET priority =?
+WHERE
+	id =?
+</sql-query>
+
+<sql-query name="SQL_All_33">
+     <![CDATA[
+SELECT
+	d.*
+FROM
+	(
+		SELECT
+			c.*, ue.tel,
+			ue.name,
+			ue.nickname,
+			ue.score
+		FROM
+			(
+				SELECT
+					a.*, b.errortotal
+				FROM
+					(
+						SELECT
+							r.*, count(user_id) AS total
+						FROM
+							report r
+						GROUP BY
+							r.user_id
+					) a
+				LEFT JOIN (
+					SELECT
+						r.*, count(user_id) AS errortotal
+					FROM
+						report r
+					WHERE
+						r.`status` = '1D01'
+					GROUP BY
+						r.user_id
+				) b ON a.user_id = b.user_id
+			) c
+		LEFT JOIN user_expand ue ON c.user_id = ue.userId
+	) d
+WHERE 1 = 1
+/**<#if (tel??) && (tel?trim != "")>**/
+		   and d.tel like  :tel
+/**</#if>**/
+/**<#if (username??) && (username?trim != "")>**/
+		   and d.name like  :username
+/**</#if>**/
+	]]>
+</sql-query>
+
+<sql-query name="SQL_All_34">
+     <![CDATA[
+SELECT * FROM (
+SELECT
+	a.*, IFNULL(b.total, 0) AS righttotal
+FROM
+	(
+		SELECT
+			r.topic_name,
+			r.topic_id,
+			r.id,
+			COUNT(r.topic_id) AS total
+		FROM
+			report r
+		GROUP BY
+			r.topic_id
+	) a
+LEFT JOIN (
+	SELECT
+		r.topic_name,
+		r.topic_id,
+		COUNT(r.topic_id) AS total
+	FROM
+		report r
+	WHERE
+		r.`status` = '1D00'
+	GROUP BY
+		r.topic_id
+) b ON a.topic_id = b.topic_id
+) c
+WHERE
+	1 = 1
+/**<#if (tel??) && (tel?trim != "")>**/
+		   and c.topic_id like  :tel
+/**</#if>**/
+/**<#if (username??) && (username?trim != "")>**/
+		   and c.topic_name like  :username
+/**</#if>**/
+	]]>
+</sql-query>
+</hibernate-mapping>

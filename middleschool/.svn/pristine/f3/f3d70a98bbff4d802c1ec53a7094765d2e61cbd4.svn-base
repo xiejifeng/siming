@@ -1,0 +1,242 @@
+/**
+ * 登录
+ */
+CommonUtils.regNamespace("Common");
+
+Common = (function() {
+	
+	var _userInfo = {
+			"arttype":"",
+			"tschool":""
+	};
+	
+	var _topicCategory ={
+			
+	};
+	
+	var _topicInfo ={
+			
+	};
+	//页面跳转
+	
+	var _changeURL = function(url){
+		  _redirectURL(url);
+//		  if(url.indexOf("?")>0){
+//			  url = url+"&random="+Math.random();
+//		  }else{
+//			  url =url+"?random="+Math.random();
+//		  }
+//		  $(window.parent.document.getElementById("home")).attr("src",url);
+	};
+	//非iframe 跳转
+	var _redirectURL = function(url){
+		if(url.indexOf("?")>0){
+			url = url+"&random="+Math.random();
+		}else{
+			url =url+"?random="+Math.random();
+		}
+		window.location.href = url;
+	};
+	
+	//公共返回按钮
+	var _back = function(code,type){
+		  history.back();
+		  return;
+		var url="";
+		if(code==1){//登录页
+			url = web_path + "appLogin/initLogin.html";
+		}else if(code==2){//首页
+			url = web_path + "appLogin/index.html";
+		}else if(code==3){//学生的个人主页
+			url = web_path + "appStudent/personal.html";
+		}else if(code==4){//老师的主页
+			url = web_path + "appTeacher/personal.html";
+		}else if(code==5){//刷题主页
+			url = web_path + "appStudent/brushExercises.html";
+		}else if(code==6){//早课列表
+			url = web_path + "appStudent/todayClass.html";
+		}else if(code==7){
+			url = web_path + "appStudent/scoreExchange.html";
+		}
+		if(type==1){
+			_redirectURL(url);//浏览器重定向
+		}else{
+			_changeURL(url);//iframe重定向
+		}
+	};
+	
+	//弹出消息提示框
+	var _showMessage = function(message,type){
+		var html = "";
+		var id = "";
+		if("info"==type){
+			html += '<div id ="info_message" class="alert" role="alert" onclick ="this.remove();"><span class="alert-success">'+message+'<span></div>';
+			id = "info_message";
+		}else if("warn"==type){
+			html +='<div  id = "warn_message" class="alert" role="alert" onclick ="this.remove();"><span class="alert-info">'+message+'<span></div>';
+			id = "warn_message";
+		}else if("error"==type){
+			html +='<div  id = "error_message" class="alert" onclick ="this.remove();" role="alert"><span class="alert-warning">'+message+'<span></div>';
+			id = "error_message";
+		}else{
+			html +='<div  id = "succ_message" class="alert" onclick ="this.remove();" role="alert"><span class="alert-danger">'+message+'<span></div>';
+			id = "succ_message";
+		}
+		$(html).appendTo($('body')); 
+		setTimeout(function () { 
+			$("#"+id).remove();
+		}, 2000);
+		
+	};
+	
+	var _getDictionaryByCode = function(code,fn){
+		var url = web_path+"appLogin/getDictionaryByCode.html";
+		$.callServiceAsJsonGet(url,{"code":code}, {
+			"before":function(){
+			 },
+			"always":function(){
+			 },
+			"done" : function(response){
+                var data =response.data;
+                for(var i=0;i<data.length;i++){
+                	if(data[i].value=='全部'){
+                		data.splice(i,1); 
+                	}
+                }
+                var html = "";
+                for(var i=0;i<data.length;i++){
+                	html+="<option value='"+data[i].id+"'>"+data[i].value+"</option>";
+                }
+                fn(html);
+			},
+			fail:function(response){
+				
+			}
+		});
+	};
+	
+	var _getSchoolInfo = function(code,city,fn){
+		var url = web_path+"appLogin/getSchoolInfo.html";
+		$.callServiceAsJsonGet(url,{"code":code,"city":city}, {
+			"before":function(){
+			},
+			"always":function(){
+			},
+			"done" : function(response){
+				var data =response.data;
+				for(var i=0;i<data.length;i++){
+					if(data[i].value=='全部'){
+						data.splice(i,1); 
+					}
+				}
+				if(data.length<=0){
+					data.push({
+						"value":"暂无学校",
+						"id":""
+					});
+				}
+				fn(data);
+			},
+			fail:function(response){
+				
+			}
+		});
+	};
+	
+	var _getAdvertisementList = function(fn){
+		var url = web_path+"appLogin/getAdvertisementList.html";
+		$.callServiceAsJsonGet(url,{}, {
+			"before":function(){
+			},
+			"always":function(){
+			},
+			"done" : function(response){
+				var data =response.data;
+				for(var i=0;i<data.length;i++){
+					data[i].width=800;
+					data[i].height=950;
+				}
+				fn(data);
+			},
+			fail:function(response){
+				
+			}
+		});
+	};
+	
+	//显示遮罩
+	var _showMask = function(){
+		if($("#mask").hasClass("dis_none")){
+			$("#mask").removeClass("dis_none");
+		}
+	};
+	//隐藏遮罩
+	var _hideMask = function(){
+		if(!$("#mask").hasClass("dis_none")){
+			$("#mask").addClass("dis_none");
+		}
+	};
+	//判断手机号是否合法
+	var _isPhoneNo = function(phone){
+	    var pattern = /^1[3456789]\d{9}$/;  
+	    return pattern.test(phone);  
+	};
+	//获取当前日期
+	var _getNowFormatDate = function () {
+	    var date = new Date();
+	    var seperator1 = "-";
+	    var seperator2 = ":";
+	    var year = date.getFullYear();
+	    var month = date.getMonth() + 1;
+	    var strDate = date.getDate();
+	    if (month >= 1 && month <= 9) {
+	        month = "0" + month;
+	    }
+	    if (strDate >= 0 && strDate <= 9) {
+	        strDate = "0" + strDate;
+	    }
+	    var currentdate = year + seperator1 + month + seperator1 + strDate
+	            + " " + date.getHours() + seperator2 + date.getMinutes()
+	            + seperator2 + date.getSeconds();
+	    return currentdate;
+	};
+	
+	//判断当前用户是否登录
+	var _checkCurrentUserIsLogin = function(){
+		var flag = false;
+		var url = web_path+"appLogin/checkCurrentUserIsLogin.html";
+		$.ajax({
+			url : url,
+			async: false,
+			type : "post",
+			data : {},
+			beforeSend:function(XMLHttpRequest){
+			},
+			complete:function(XMLHttpRequest, textStatus){
+			},
+			success : function(response) {
+				var data = jQuery.parseJSON(response).data;
+				flag = data;
+			}
+		});
+		return flag;
+	};
+	return {
+		 changeURL 					: 				_changeURL,
+		 back                       :               _back,
+		 redirectURL                :               _redirectURL,
+		 showMessage                :               _showMessage,
+		 getDictionaryByCode       :                _getDictionaryByCode,
+		 userInfo                 :                 _userInfo,
+		 showMask                :                 _showMask,
+		 hideMask                :                 _hideMask,
+		 topicCategory          :                 _topicCategory,
+		 isPhoneNo      :    _isPhoneNo,
+		 topicInfo      :    _topicInfo,
+		 getNowFormatDate : _getNowFormatDate,
+		 checkCurrentUserIsLogin   : _checkCurrentUserIsLogin,
+		 getAdvertisementList:  _getAdvertisementList,
+		 getSchoolInfo:  _getSchoolInfo
+	};       
+	
+})();

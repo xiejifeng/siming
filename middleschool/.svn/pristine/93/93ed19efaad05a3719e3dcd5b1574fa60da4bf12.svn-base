@@ -1,0 +1,80 @@
+/*清除默认样式*/
+*{ 
+  padding:0; 
+  margin:0; 
+}
+li{ 
+  list-style:none; 
+} 
+a{ 
+  text-decoration:none; 
+  color:black;
+}
+.fl{ 
+  float:left; 
+}
+.fr{ 
+  float:right; 
+}
+.clearFix:after{ 
+  content:""; display:block; clear:both; 
+}
+.clearFix{ 
+  zoom:1; 
+}
+img,input,textarea,select{ 
+  vertical-align:top; 
+}
+input,textarea,select{ 
+  outline:none; 
+  border:none;
+}
+textarea{ 
+  resize:none; 
+}
+html{
+  font-size:32px;
+  font-family: 微软雅黑;
+}
+.wrapper{
+  width:10rem;
+  margin:0 auto;
+}
+html,body{
+  height:100%;
+}
+/*清除默认样式结束*/
+
+.alert {
+  width: 87.5%;
+    height: 30px;
+    line-height: 30px;
+    text-align: center;
+    font-size: 14px;
+    border-radius: 2px;
+    border: 1px solid #eee;
+    box-shadow: 0 0 0.1rem #ddd;
+    position: fixed;
+    bottom: 30px;
+    left: 6.25%;
+}
+.alert-success {
+  color: #3c763d;
+  background: #dff0d8;
+  border-color: #d6e9c6;
+}
+.alert-info {
+  color: #31708f;
+  background: #d9edf7;
+  border-color: #bce8f1;
+}
+.alert-warning {
+  color: #8a6d3b;
+  background: #fcf8e3;
+  border-color: #faebcc;
+}
+.alert-danger {
+  color: #a94442;
+  background: #f2dede;
+  border-color: #ebccd1;
+}

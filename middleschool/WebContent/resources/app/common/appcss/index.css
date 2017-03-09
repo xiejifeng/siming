@@ -1,0 +1,129 @@
+/*header*/
+header{
+  height:0.93rem;
+  background-color:#00acf0;
+  text-align: center;
+  padding-top:0.3rem;
+  position:relative;
+}
+.logo{
+  font-size:0.61rem;
+  color:white;
+  font-weight: normal;
+}
+.personal{
+  position:absolute;
+  right:0.26rem;
+  bottom:0.1rem;
+  width:1rem;
+  height:1rem;
+}
+.personal img{
+	width: 100%;
+	height: 100%;
+	border-radius: 50%;
+}
+
+/*banner*/
+.banner{
+  height:5.21rem;
+}
+.banner img{
+  width:100%;
+}
+
+/*nav*/
+nav{
+  overflow: hidden;
+}
+.tab-head{
+  display: -webkit-box;
+  background-color: #e6e6e6;
+  padding-top:0.13rem;
+  margin: 0;
+  padding-left: 0;
+}
+.tab-head li{
+  -webkit-box-flex:1; 
+  height:1.07rem;
+  
+  text-align: center;
+}
+.tab-head a{
+  display: inline-block;
+  height:100%;
+  line-height: 100%;
+  vertical-align: top;
+  margin-top: 0.2rem;
+}
+.tab-head img{
+  width:1.5rem;
+}
+.tab-head li.active{
+  background:url(../images/tab-head-bg.png) no-repeat;
+  background-size: 100% 100%;
+}
+.tab-body{
+  width:8.28rem;
+  padding:0.43rem 0.86rem 0;
+}
+.tab-body li{
+  height:1.46rem;
+  position:relative;
+  margin-bottom:0.37rem;
+}
+.tab-body i{
+  font-style: normal;
+  
+}
+.tab-body span{
+  font-size:0.46rem;
+  font-family: 楷体;
+  position:absolute;
+  left:0;
+  top:0;
+}
+.tab-body a{
+  height:calc(100% - 0.11rem);
+  font-size:0.5rem;
+  overflow: hidden;
+  /*-webkit-line-clamp: 2;*/
+  text-overflow:ellipsis;
+  word-wrap:break-word;
+  line-height: 0.56rem;
+  /*display: -webkit-box;*/
+  /*-webkit-box-orient: vertical;*/
+}
+.tab-body a p{
+  text-indent:0.25rem;
+  margin: 0;
+  margin-bottom: 0.3rem;
+}
+.tab-body li.new .icon{
+  width:0.93rem;
+  height:0.56rem;
+  background:url(../images/new.png) no-repeat;
+  background-size: 100% 100%;
+  position:absolute;
+  left:-0.68rem;
+  top:-0.31rem;
+}
+.container{
+  width:300%;
+  display: -webkit-box;
+  -webkit-transition:1s all ease;
+}
+.container ul{
+  -webkit-box-flex:1; 
+  -webkit-transform:translateY(0px);
+  height:8.85rem;
+  overflow-y: scroll;
+  margin: 0;
+}
+hr{
+  color:#999;
+  margin-top:0.11rem;
+}
+/*.tab-body a>*{
+  display: inline;
+}*/

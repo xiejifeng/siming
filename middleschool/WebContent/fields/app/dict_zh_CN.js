@@ -1,0 +1,19 @@
+var fields={
+		"grid_title":"字典列表",
+		"grid_operate":"操作",
+		"dict_no":"序号",
+		"dict_code":"编码",
+		"dict_text":"名称",
+		"dict_category":"类别编码",
+		"dict_remark":"类别名称",
+		"dict_association":"关联项",
+		"dict_systemLevel":"是否系统参数",
+		"dict_enabled":"是否激活",
+		"dict_priority":"优先级",
+		"dict_keyword":"关键字",
+		"boolean_yes":"是",
+		"boolean_no":"否",
+		"opt_append":'新建',
+		"opt_edit":'编辑',
+		"opt_remove":'删除'
+};

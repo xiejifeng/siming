@@ -1,0 +1,423 @@
+/**
+ * 登录
+ */
+CommonUtils.regNamespace("offerChange");
+
+appLogin = (function() {
+	//验证码等待时间
+	var wait = 60;
+	//定时器
+	var clock = '';
+	
+	// 登录
+	var _login = function() {
+		var username =  $("#username").val().trim();
+		var password =   $("#password").val().trim();
+		var codeFlag = false;
+		var code = null;
+		if(!$("#code_div").hasClass("dis_none")){
+			code = $("#code").val().trim();
+			codeFlag =true;
+		}
+		if(!username){
+			Common.showMessage("用户名不能为空", "warn");
+			return;
+		}
+		if(!password){
+			Common.showMessage("密码不能为空", "warn");
+			return;
+		}
+		if(codeFlag){
+			if(!code){
+				Common.showMessage("验证码不能为空", "warn");
+				return;
+			}
+		}
+		var params = {
+			"username" :username,
+			"password" :password,
+			"code":code
+		};
+		var url = web_path + "appLogin/login.html";
+		$.ajax({
+			url : url,
+			type : "post",
+			data : params,
+			beforeSend:function(XMLHttpRequest){
+				Common.showMask();
+			},
+			complete:function(XMLHttpRequest, textStatus){
+				Common.hideMask();
+			},
+			success : function(response) {
+				var data = jQuery.parseJSON(response).data;
+				if ("0" == data.resultCode) {
+					Common.redirectURL(web_path + "appLogin/index.html");
+				} else {
+					var errCount = data.errCount;
+					if(errCount>=5){
+						if($("#code_div").hasClass("dis_none")){
+							$("#code_div").removeClass("dis_none");
+						}
+						_changeValidateCode();
+					}
+					Common.showMessage(data.resultMsg, "error");
+				}
+			}
+		});
+
+	};
+
+	// 更改验证码
+	var _changeValidateCode = function() {
+		var imgSrc = $("#validateCode");
+		var src = imgSrc.attr("src");
+		imgSrc.attr("src", src + "?num=" + Math.random());
+	};
+
+	// 忘记密码
+	var _forgetPassword = function() {
+		var url = web_path + "appLogin/forgetPassword.html";
+		Common.redirectURL(url);
+	};
+
+	// 用户注册
+	var _userRegistry = function() {
+		var url = web_path + "appLogin/userRegistry.html";
+		Common.redirectURL(url);
+	};
+
+	//短信验证
+	var _getValidateCode = function(type){
+		var tel =$("#tel").val();
+		if(!tel){
+			Common.showMessage("请输入手机号", "warn");
+			return;
+		}
+		if(!Common.isPhoneNo(tel)){
+			Common.showMessage("您输入的手机号不合法哦", "warn");
+			return;			
+		}
+		var url = web_path + "appLogin/getTelCode.html";
+		$.callServiceAsJsonGet(url, {"tel":tel,"type":type}, {
+			"before" : function() {
+				Common.showMask();
+			},
+			"always" : function() {
+				Common.hideMask();
+			},
+			"done" : function(response) {
+				var data = response.data;
+				if ("0" == data.resultCode) {
+					Common.showMessage("获取验证码成功", "succ");
+					Common.userInfo.sendSuccValidate = true;
+					_readSecond(type);
+				} else {
+					Common.showMessage(data.resultMsg, "error");
+				}
+			},
+			fail : function(response) {
+				Common.hideMask();
+			}
+		});
+	};
+	// 用户注册 --手机验证
+	var _userRegistryValidateTel = function() {
+		var nickname = $("#nickname").val();
+		var tel = $("#tel").val(); 
+		var validateCode = $("#validateCode").val(); 
+//		var referee = $("#referee").val();
+		Common.userInfo.username = nickname;
+		Common.userInfo.tel = tel;
+		Common.userInfo.checkCode =validateCode;
+//		Common.userInfo.referee = referee;
+		if(!Common.userInfo.usertype){
+			Common.showMessage("请选择用户类型", "warn");
+			return;
+		}
+		if(!nickname){
+			Common.showMessage("用户名不能为空,请输入", "warn");
+			return;
+		}
+		if(!tel){
+			Common.showMessage("手机号码不能为空,请输入", "warn");
+			return;
+		}
+		if(!Common.userInfo.sendSuccValidate){
+			Common.showMessage("请获取手机验证码", "warn");
+			return;
+		}
+		if(!Common.userInfo.checkCode){
+			Common.showMessage("请输入验证码", "warn");
+			return;
+		}
+		//判断用户名是否存在
+		var url = web_path + "appLogin/checkUserName.html";
+		$.callServiceAsJsonGet(url, {"username":nickname}, {
+			"before" : function() {
+				Common.showMask();
+			},
+			"always" : function() {
+				Common.hideMask();
+			},
+			"done" : function(response) {
+				var data = response.data;
+				if ("1" == data.resultCode) {
+					Common.showMessage(data.resultMsg, "error");
+					return;
+				}else{
+					Common.userInfo.userRegistryValidateTelFlag = true;
+					$('.g-tab-box .tab-list .active').removeClass('active');
+					$('.g-tab-box .tab2 a').addClass('active');
+					$('.tab1-box').css('display', 'none');
+					$('.tab2-box').css('display', 'block');
+				}
+			},
+			fail : function(response) {
+				Common.hideMask();
+			}
+		});
+
+	};
+
+	// 用户注册 --密码设置
+	var _userRegistryPwdSet = function() {
+		var pwd = $("#pwd").val();
+		var againPwd = $("#againPwd").val();
+		var user_img = $("#pre_user_img").attr("src");
+		if (pwd == againPwd) {
+			Common.userInfo.pwd = pwd;
+		} else {
+			Common.showMessage("两次输入密码不一致,请重新输入", "warn");
+			return;
+		}
+		if(againPwd.length<6){
+			Common.showMessage("密码长度需6位以上", "warn");
+			return;
+		}
+		Common.userInfo.img = user_img;
+		Common.userInfo.userRegistryPwdSetFlag = true;
+		$("#div_confirm").removeClass("dis_none");
+	};
+
+	// 用户注册 --信息填写
+	var _userRegistryInfo = function() {
+		var name = $("#name").val();
+		var school = $("#school").val();
+//		var grade = $("#grade").val();
+		var img = $("#pre_user_img").attr("src");
+//		var teacher_tel = $("#teacher_tel").val();
+		Common.userInfo.name = name;
+		Common.userInfo.school = school;
+//		Common.userInfo.grade = grade;
+		Common.userInfo.teacher_tel = "";
+		Common.userInfo.img = img;
+		if(!name){
+			Common.showMessage("真实姓名不能为空,请输入", "warn");
+			return;
+		}
+		if(!Common.userInfo.city){
+			Common.showMessage("请选择所在城市", "warn");
+			return;
+		}
+		if(!Common.userInfo.userRegistryValidateTelFlag){
+			Common.showMessage("请先进行手机验证", "warn");
+			return;
+		}
+		if(!Common.userInfo.userRegistryValidateTelFlag){
+			Common.showMessage("请先进行密码确认", "warn");
+			return;
+		}
+		var url = web_path + "appLogin/registry.html";
+		$("#submitBut").attr("disabled",true);
+		$.ajax({
+			url : url,
+			type : "post",
+			data : Common.userInfo,
+			beforeSend:function(XMLHttpRequest){
+				Common.showMask();
+			},
+			complete:function(XMLHttpRequest, textStatus){
+				
+			},
+			success : function(response) {
+				var data = jQuery.parseJSON(response).data;
+				if(data.resultCode=="0"){
+					Common.showMessage(data.resultMsg, "succ");
+					window.setTimeout('Common.redirectURL(web_path + "appLogin/index.html")',500);
+				}else{
+					$("#submitBut").attr("disabled",false);
+					Common.showMessage(data.resultMsg, "error");
+				}
+			}
+		});
+	};
+    //读秒操作
+	 var _readSecond = function sendCode(type){ 
+		$("#validateTime").attr("onclick","javascript:void(0);");
+		$("#validateTime").text(wait+'s可获取');
+		 clock = setInterval(function(){
+			 _doLoop(type);
+		 }, 1000); //一秒执行一次
+	 };
+	 
+	 var _doLoop = function doLoop(type){
+			wait--;
+			 if(wait > 0){
+				 $("#validateTime").text(wait+'s可获取');
+			 }else{
+				 $("#validateTime").text("重新获取");
+			     $("#validateTime").attr("onclick","appLogin.getValidateCode("+type+");");
+			     clearInterval(clock); //清除js定时器
+			     wait = 60; //重置时间
+		     }
+    };
+    
+    //密码重置
+    var _reSetPwd = function(){
+		var tel =   $("#tel").val().trim();
+		var code =   $("#code").val().trim();
+		var newPwd =   $("#newPwd").val().trim();
+		if(!tel){
+			Common.showMessage("手机号不能为空", "warn");
+			return;
+		}
+		if(!code){
+			Common.showMessage("短信验证码不能为空", "warn");
+			return;
+		}
+		if(!newPwd){
+			Common.showMessage("新密码不能为空", "warn");
+			return;
+		}
+		var url = web_path + "appLogin/reSetPwd.html";
+		$.callServiceAsJsonGet(url, {"tel":tel,"code":code,"newPwd":newPwd}, {
+			"before" : function() {
+				Common.showMask();
+			},
+			"always" : function() {
+				Common.hideMask();
+			},
+			"done" : function(response) {
+				var data = response.data;
+				if ("1" == data.resultCode) {
+					Common.showMessage(data.resultMsg, "error");
+					return;
+				}else{
+					Common.showMessage(data.resultMsg, "succ");
+					window.setTimeout('Common.redirectURL(web_path + "appLogin/initLogin.html")',2000);
+				}
+			},
+			fail : function(response) {
+				Common.hideMask();
+			}
+		});	
+		
+    };
+    
+    //下一步
+    var _nextStep = function(){
+		if(!Common.userInfo.sendSuccValidate){
+			Common.showMessage("请获取手机验证码", "warn");
+			$("#div_confirm").addClass("dis_none");
+			return;
+		}
+		if(!Common.userInfo.checkCode){
+			Common.showMessage("请输入验证码", "warn");
+			$("#div_confirm").addClass("dis_none");
+			return;
+		}
+    	$("#div_confirm").addClass("dis_none");
+		if(Common.userInfo.usertype=="1600"){
+			$("#school_li").hide();
+			$("#grade_li").hide();
+			$("#arttype_li").hide();
+			$("#educationStage").hide();
+//			$("#teacher_li").hide();
+		}else{
+			$("#school_li").show();
+			$("#grade_li").show();
+			$("#arttype_li").show();
+			$("#educationStage").show();
+//			$("#teacher_li").show();
+		}
+		$('.g-tab-box .tab-list .active').removeClass('active');
+		$('.g-tab-box .tab3 a').addClass('active');
+		$('.tab2-box').css('display', 'none');
+		$('.tab3-box').css('display', 'block');
+    };
+    //取消直接提交用户注册信息
+    var _cancelAndSubmit = function(){
+		if(!Common.userInfo.sendSuccValidate){
+			Common.showMessage("请获取手机验证码", "warn");
+			$("#div_confirm").addClass("dis_none");
+			return;
+		}
+		if(!Common.userInfo.checkCode){
+			Common.showMessage("请输入验证码", "warn");
+			$("#div_confirm").addClass("dis_none");
+			return;
+		}
+		var url = web_path + "appLogin/registry.html";
+		$.ajax({
+			url : url,
+			type : "post",
+			data : Common.userInfo,
+			beforeSend:function(XMLHttpRequest){
+				$("#div_confirm").addClass("dis_none");
+				Common.showMask();
+			},
+			complete:function(XMLHttpRequest, textStatus){
+				Common.hideMask();
+			},
+			success : function(response) {
+				var data = jQuery.parseJSON(response).data;
+				if(data.resultCode=="0"){
+					Common.showMessage(data.resultMsg, "succ");
+					window.setTimeout('Common.redirectURL(web_path + "appLogin/index.html")',2000);
+				}else{
+					Common.showMessage(data.resultMsg, "error");
+				}
+			}
+		});
+    };
+    
+    //用户选择
+    var _chooseUserType = function(obj){
+    	var type =$(obj).val();
+    	if(type==1600){
+    		$("#div_pop").removeClass("dis-none");
+    	}
+    	Common.userInfo.usertype =type;
+    };
+    
+    //放弃注册教师
+    var _giveUpRegistryTeacher = function(){
+    	$("#radio_student").attr("checked",true);
+    	$("#div_pop").addClass("dis-none");
+    	Common.userInfo.usertype ="1601";
+    };
+    //继续
+    var _keepOnRegistryTeacher = function(){
+    	$("#div_pop").addClass("dis-none");
+    };
+	return {
+		login : _login,
+		changeValidateCode : _changeValidateCode,
+		forgetPassword : _forgetPassword,
+		userRegistry : _userRegistry,
+		userRegistryValidateTel : _userRegistryValidateTel,
+		userRegistryPwdSet : _userRegistryPwdSet,
+		userRegistryInfo : _userRegistryInfo,
+		getValidateCode     : _getValidateCode,
+		doLoop             : _doLoop,
+		readSecond      :  _readSecond,
+		reSetPwd       :  _reSetPwd,
+		nextStep     :  _nextStep,
+		cancelAndSubmit  :_cancelAndSubmit,
+		chooseUserType  :  _chooseUserType,
+		giveUpRegistryTeacher : _giveUpRegistryTeacher,
+		keepOnRegistryTeacher : _keepOnRegistryTeacher
+	};
+
+})();

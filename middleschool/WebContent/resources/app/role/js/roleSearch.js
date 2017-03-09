@@ -1,0 +1,29 @@
+$(function(){
+	$("#search").jButton({
+		plain:false,
+		iconCls:'icon-search'
+	});
+	$("#reset").jButton({
+		plain:false,
+		iconCls:'icon-undo'
+	});
+	$("#name").validate({
+		required:false,
+		validType:'valid["zh_length[2,32]"]'
+	});
+	$("#authority").validate({
+		required:false,
+		validType:'regexp',
+		regular:/^\w{4,128}$/,
+		invalidMessage:'role.authority'
+	});
+	
+	$("#reset").click(function(){
+		$("#frm").ajaxForm("clear"); 
+	});
+	
+	$("#search").click(function(){
+		$("#role_grid").jDatagrid("load",$.formItems($("#frm")));
+		$("#search_role_win").closeWindow();
+	});
+});

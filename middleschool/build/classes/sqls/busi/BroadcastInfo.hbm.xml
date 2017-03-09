@@ -1,0 +1,19 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+	<sql-query name="SQL_BROADCASTINFO_1">
+     <![CDATA[
+     	SELECT B.broadcastInfoId as BROADCASTINFOID,B.updateDate as UPDATEDATE,U.username as USERNAME,B.timingIssueWeek as TIMINGISSUEWEEK,B.timingIssueWeek  AS TIMINGISSUEWEEKNAME,B.timingIssueTime AS TIMINGISSUETIMENAME,B.timingIssueTime as TIMINGISSUETIME,B.primaryContent as PRIMARYCONTENT,B.extendedContent as EXTENDEDCONTENT,B.issueType  as ISSUETYPE 
+     	FROM broadcast_info B,sys_user U
+     	WHERE B.insertUserId = U.id AND B.broadcastType = '0'
+     	ORDER BY B.issueType DESC,B.updateDate DESC
+     ]]>
+	</sql-query>
+	<sql-query name="SQL_BROADCASTINFO_2">
+	  <![CDATA[
+	     DELETE FROM broadcast_info
+	    WHERE broadcastInfoId = ?
+	  ]]>
+	</sql-query>
+</hibernate-mapping>

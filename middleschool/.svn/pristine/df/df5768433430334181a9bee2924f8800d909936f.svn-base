@@ -1,0 +1,305 @@
+$(function(){
+	initDatagrid();
+	$("#city").selectParam({
+		required:true,
+		typeId:'18',
+		defaultValue:'1813',
+		panelHeight:100,
+		invalidMessage:'获取运营商信息失败',
+		width:'98%',
+		onChange:function(newValue,oldValue){
+			getSchoolInfo(newValue);
+		}
+	});
+	$("#status").selectParam({
+		required:true,
+		typeId:'1K',
+		defaultValue:'1K02',
+		panelHeight:100,
+		invalidMessage:'获取运营商信息失败',
+		width:'98%'
+	});
+	
+	
+	$("#deleteUser").click(function(){
+		var selectedRow = $('#user_grid').datagrid('getSelections');
+		var userIds="";
+		if(selectedRow.length==0){
+			 $.popUpMessage("请选择一条记录",null,'0');
+			return false;
+		}else{
+			for(var i=0;i<selectedRow.length;i++){
+				if(userIds==""){
+					userIds =selectedRow[i].id;
+				}else{
+					userIds=userIds+","+selectedRow[i].id;
+				}
+			}
+			$.popUpMessage('您要删除这些对应关系?',null, '0', function(){
+				$.ffcsAjax({
+					url:web_path + 'schart/deleteschart.do',
+					data:{"ids":userIds},
+					success:function(data){
+						if(data){
+							$.popUpMessage('删除成功',null, '0',function(){
+								$("#user_grid").jDatagrid("reload");
+							},false,true);
+						}else{
+							$.popUpMessage('删除失败',null, '0',function(){
+								$("#user_grid").jDatagrid("reload");
+							},false,true);
+						}
+						
+					}
+				});	
+			}, function (){
+				return;
+			});
+			
+		}
+	});
+	// 获取页面宽度
+	var height = $(window).height();
+	$("#user_grid").datagrid('resize', {
+		height : height - 150
+	});
+	
+	$("#addschart").click(function(){
+		$.openWindow({
+			   id:"add_user_win",
+			   resizable:false,
+			   draggable:false,
+			   title:"新增关联",
+			   type:'iframe',
+			   width:750,
+			   height:507,
+			   modal:true,
+			   url:web_path+"schart/schartAddInit.do",
+			   onLoadSuccess:function(data){
+			   },
+			   onClose:function(data){
+					if (data.result == "reload") {
+						$("#user_grid").jDatagrid("reload");
+					}
+			   }
+		},true);
+	});
+	
+	/**
+	 * 新增广告
+	 */
+	$("#saveAddschart").click(function(){
+		var click_url =$("#click_url").val();
+		var status = $("#status").combo("getValue");
+		var priority = $("#priority").val();
+		if(!priority){
+			priority=0;
+		}
+		var data={
+				"click_url":click_url,
+				"status":status,
+				"priority":priority
+		};
+		$.popUpMessage('您要新增这条广告?',null, '0',function(){
+			$.addMask();
+			$.ajaxFileUpload({
+				url : web_path+'schart/saveschart.do',
+				secureuri : false,
+				data : data,
+				fileElementId :['cover'],
+				dataType : 'json',
+				success : function(data) {
+					$.removeMask();
+					if(data.code==true){
+						$.popUpMessage('新增成功',null, '0',function(){
+							$("#add_user_win").closeWindow({"result":"reload"});
+						},false,true);
+					}else{
+						$.popUpMessage('新增成功',null, '0',function(){
+							$("#add_user_win").closeWindow({"result":"reload"});
+						},false,true);
+					}
+				},
+				error : function(data) {
+					
+				}
+			});	
+		},false,true);
+	});
+	/**
+	 * 编辑广告
+	 */
+	$("#saveEditschart").click(function(){
+		var id =$("#schartId").val();
+		var click_url =$("#click_url").val();
+		var status = $("#status").combo("getValue");
+		var pre_cover = $("#pre_cover").attr("src");
+		var priority = $("#priority").val();
+		if(!priority){
+			priority=0;
+		}
+		var data={
+				"id":id,
+				"click_url":click_url,
+				"status":status,
+				"priority":priority,
+				"img_url":pre_cover
+		};
+		$.popUpMessage('您确定要修改这条广告?',null, '0',function(){
+			$.addMask();
+			$.ajaxFileUpload({
+				url : web_path+'schart/editschart.do',
+				secureuri : false,
+				data : data,
+				fileElementId :['cover'],
+				dataType : 'json',
+				success : function(data) {
+					$.removeMask();
+					if(data.code==true){
+						$.popUpMessage('修改成功',null, '0',function(){
+							$("#edit_user_win").closeWindow({"result":"reload"});
+						},false,true);
+					}else{
+						$.popUpMessage('修改失败',null, '0',function(){
+							$("#edit_user_win").closeWindow({"result":"reload"});
+						},false,true);
+					}
+				},
+				error : function(data) {
+					
+				}
+			});	
+		},false,true);
+	});
+	
+	
+	
+});
+
+function initDatagrid(){
+	var height = $(window).height()-120;
+	$("#user_grid").jDatagrid({
+		height:height,
+		width:"auto",
+		fit:false,
+		fitColumns:true,
+		nowrap:false,
+		striped:true,
+		singleSelect:false,
+		collapsible : true,
+		url:web_path+"schart/listAllschart.do",
+		remoteSort : true,
+		isInitLoad : true,
+		rownumbers:true,
+		sortName:'priority',
+		sortOrder:'DESC',
+		pagination : true,
+		frozenColumns:[[
+		                {title:" ",field:' ',width : 20,align:'center',checkbox:true}
+		               
+		]],
+		columns:[[
+		          {title:'区域',field:'areaname',width:200,align:'center',},
+		          {title:'学校',field:'schoolname',width:200,align:'center'},
+		          {title:'优先级',field:'priority',width:50,align:'center'},
+		          {title:'创建时间',field:'createtime',width:200,align:'center'},
+		          {title:'操作',
+			             field:"id",
+			             width:100,
+			             align:'center',
+			             formatter:function(value,row,rowindex){
+			            	   var html='<img src="'+web_path+'resources/app/common/img/btnEditor.jpg" name ="edit" onclick="editAvertisement('+row['id']+');"/>';
+			                   return html;
+			             }
+		              }
+		]],
+
+		onLoadSuccess:function(){
+		}
+	});
+}
+function change(obj){
+	if(obj.value =='请输入...'){
+		obj.value = "";
+	}
+}
+
+
+
+function change1(obj){
+	if(obj.value ==''){
+		obj.value = "请输入...";
+	}
+}
+
+function editAvertisement (id){
+		$.openWindow({
+		   id:"edit_user_win",
+		   resizable:false,
+		   draggable:false,
+		   title:"编辑",
+		   type:'iframe',
+		   width:680,
+		   height:377,
+		   modal:true,
+		   url:web_path+"schart/schartEditInit.do?id="+id,
+		   onLoadSuccess:function(data){
+			   $.loadJs("resources/busi/schart/schartEdit.js");
+		   },
+		   onClose:function(data){
+				if (data.result == "reload") {
+					$("#user_grid").jDatagrid("reload");
+				} 
+		   }
+	},true);
+}
+// 上传图片
+function _modifyUserImg(obj) {
+	var file = obj.files[0];
+	// 判断类型是不是图片
+	if (!/image\/\w+/.test(file.type)) {
+		Common.showMessage("请确保文件为图像类型", "warn");
+		return false;
+	}   
+	var reader = new FileReader();
+	reader.readAsDataURL(file);
+	reader.onload = function(e) {
+		var result = this.result;
+        $("#pre_cover").attr("src",result); 
+	};
+};
+function queryBehaviorByParams() {
+	var params = {
+		"area_id":$("#city").combo("getValue"),
+		"school_id":$("#tschool").combo("getValue")
+	};
+
+	$("#user_grid").jDatagrid("load", params);
+}
+
+
+
+function getSchoolInfo(city){
+	var url = web_path+"appLogin/getSchoolInfo.html";
+	$.ajax({
+		url : url,
+		async: false,
+		type : "post",
+		data : {"code":"","city":city},
+		beforeSend:function(XMLHttpRequest){
+		},
+		complete:function(XMLHttpRequest, textStatus){
+		},
+		success : function(response) {
+			var data =jQuery.parseJSON(response).data;
+			$('#tschool').autocomplete({
+				data :data,
+				valueField : 'id',
+				textField : 'value',
+				panelHeight : 150,
+				panelWidth : 120
+			});
+			$(".combo-text").css("width","120px");
+		}
+	});
+};

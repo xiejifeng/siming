@@ -1,0 +1,53 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+	pageEncoding="UTF-8"%>
+<%@include file="/plugins/customer/jsp/appcommon.jsp"%>
+<!DOCTYPE>
+<html>
+<head>
+		<meta charset="utf-8">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge">
+		<meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0;" name="viewport" />
+		<title>思明E学</title>
+		<link rel="stylesheet" type="text/css" href="<%=path%>resources/app/common/appcss/common.css">
+        <link rel="stylesheet" href="<%=path%>resources/app/common/appcss/login.css">
+	<link rel="stylesheet" href="<%=path%>resources/app/common/appcss/formPro.css"></head>
+</head>
+<body>
+	<header class="wrapper">
+		<img src="<%=path%>resources/app/common/images/logo.png">
+	</header>
+	<section class="wrap pic">
+		<img src="<%=path%>resources/app/common/images/pic1.png">
+	</section>
+	<section class="login wrap">
+		<form action="#" method="post">
+			<div class="form-group">
+				<input type="text" name="username" placeholder="手机号码"  id="username"  onkeyup="value=value.replace(/[\W]/g,'')" onbeforepaste="clipboardData.setData('text',clipboardData.getData('text').replace(/[^\d]/g,''))">
+			</div>
+			<div class="form-group">
+				<input type="password" name="password" placeholder="密码" id= "password"  onkeyup="value=value.replace(/[\W]/g,'')" onbeforepaste="clipboardData.setData('text',clipboardData.getData('text').replace(/[^\d]/g,''))">
+			</div>
+			<div class="form-group clearFix dis_none"  id="code_div">
+				<div class="code-pic fl">
+				     <img id = "validateCode" src="<%=path%>appLogin/getValidateCode.html" class="yzm" onclick="appLogin.changeValidateCode();"/>
+				</div>
+				<input type="text" name="code" placeholder="输入验证码" class="fl" id="code">
+			</div>
+			<a ><a class=""  onclick="appLogin.login();" style="background: #00acf0; color: #fff;width:100%; height:1.18rem; border-radius:0.125rem; border: none; font-size: 0.5rem; display: inline-block; text-align: center; line-height: 1.18rem;">用户登录</a></a>
+		</form>
+		<div class="user-link">
+			<a href="#" onclick="appLogin.userRegistry();">用户注册</a>
+			<a href="#" onclick="Common.back(3,2);">继续答题</a>
+			<a href ="#" onclick="appLogin.forgetPassword();">忘记密码</a>
+		</div>
+	</section>
+	<script>
+		changeWidth();
+		function changeWidth(){
+			var rem=32/320*document.documentElement.clientWidth;
+			document.documentElement.style.fontSize=rem+'px';
+		}
+		window.addEventListener('resize',changeWidth,false);
+		</script>
+	</body>
+</html>

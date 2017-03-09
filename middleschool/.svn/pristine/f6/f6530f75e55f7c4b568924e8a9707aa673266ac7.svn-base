@@ -1,0 +1,157 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project basedir="." name="txb" default="create_war">
+	<property file="build.properties"></property>
+	
+	<property name="src.dir" value="src"></property>
+	<property name="dist.dir" value="build"></property>
+	<property name="class.dir" value="build/classes"></property>
+	<property name="app.dir" value="${app.dir}"></property>
+	<property name="tomcat.home" value="${tomcat.home}"></property>
+	<property name="project.dir" value="${project.dir}"></property>
+	<property name="jar.file" value="srp-${jar.version}.jar"></property>
+	<property name="core.jar.file" value="srp-core-${jar.version}.jar"></property>
+	<property name="app.jar.file" value="srp-app-${jar.version}.jar"></property>
+	<property name="source.jar.file" value="srp-${jar.version}-sources.jar"></property>
+	<property name="war.file" value="srp.war"></property>
+	<property name="app.file" value="srp"></property>
+	<property name="encoding" value="UTF-8"></property>
+	
+	<tstamp prefix="timefmt">
+		<format property="day" pattern="yyyy-MM-dd"/>
+		<format property="time" pattern="HH:mm:ss"/>
+		<format property="dt" pattern="yyyy-MM-dd HH:mm:ss.SSS"/>
+	</tstamp>
+	
+	<path id="libs">
+		<fileset dir="WebContent/WEB-INF/lib" includes="*.jar"></fileset>
+		<fileset dir="${tomcat.home}/lib" includes="*.jar"></fileset>
+	</path>
+	
+	<target name="clean">
+		<delete dir="${class.dir}"></delete>
+		<delete file="${jar.file}"></delete>
+		<delete file="${source.jar.file}"></delete>
+	</target>
+	
+	<target name="mkdir" depends="clean">
+		<mkdir dir="${class.dir}"/>
+	</target>
+	
+	<target name="compile" depends="mkdir">
+		<javac srcdir="${src.dir}" destdir="${class.dir}" debug="true" includeantruntime="true" encoding="${encoding}">
+			<classpath refid="libs"></classpath>
+		</javac>
+	</target>
+	
+	<target name="packSrc">
+		<jar destfile="${dist.dir}/${source.jar.file}">
+			<fileset dir="${src.dir}" includes="**/*.java"></fileset>
+		</jar>
+	</target>
+	<target name="pack" depends="compile">
+		<jar destfile="${dist.dir}/${jar.file}" basedir="${class.dir}"></jar>
+		<antcall target="packSrc"></antcall>
+	</target>
+	<target name="pack_exclude_workflow" depends="compile">
+		<jar destfile="${dist.dir}/${jar.file}">
+			<fileset dir="${class.dir}" excludes="**/workflow/**/*.class"></fileset>
+		</jar>
+		<antcall target="packSrc"></antcall>
+	</target>
+	<target name="pack_exclude_app_tools" depends="compile">
+		<jar destfile="${dist.dir}/${jar.file}">
+			<fileset dir="${class.dir}">
+				<exclude name="**/cn/ffcs/srp/app/**"/>
+				<exclude name="**/cn/ffcs/srp/tools/designer/**"/>
+			</fileset>
+		</jar>
+		<antcall target="packSrc"></antcall>
+	</target>
+	<!--图小宝项目-->
+	<target name="pack_exclude_app_txb" depends="compile">
+			<jar destfile="${dist.dir}/${jar.file}">
+				<fileset dir="${class.dir}">
+					<exclude name="**/cn/ffcs/srp/app/webim/**"/>
+					<exclude name="**/cn/ffcs/srp/tools/designer/**"/>
+					<exclude name="**/cn/ffcs/srp/app/workflow/**"/>
+				</fileset>
+			</jar>
+			<antcall target="packSrc"></antcall>
+	</target>
+	<!--
+	<target name="compile_app" depends="mkdir">
+		<javac srcdir="${src.dir}/cn/ffcs/srp/app" destdir="${class.dir}" debug="true" includeantruntime="true" encoding="${encoding}">
+			<classpath>
+				<path refid="libs"></path>
+				<pathelement location="${dist.dir}/${jar.file}"/>
+			</classpath>
+		</javac>
+	</target>
+	<target name="pack_app" depends="compile_app">
+		<jar destfile="${dist.dir}/${app.jar.file}" basedir="${class.dir}"></jar>
+	</target>
+	
+	<target name="compile_core" depends="mkdir">
+		<javac srcdir="${src.dir}" excludes="cn/ffcs/srp/app/**/*.java" destdir="${class.dir}" debug="true" includeantruntime="true" encoding="${encoding}">
+			<classpath refid="libs"></classpath>
+		</javac>
+	</target>
+	<target name="pack_core" depends="compile_core">
+		<jar destfile="${dist.dir}/${core.jar.file}" basedir="${class.dir}"></jar>
+	</target>
+	-->
+	
+	<target name="packAll" depends="compile">
+		<jar destfile="${dist.dir}/${jar.file}">
+			<fileset dir="${class.dir}"></fileset>
+			<fileset dir="${src.dir}" excludes="**/*.java"></fileset>
+		</jar>
+		<antcall target="packSrc"></antcall>
+	</target>
+	
+	<target name="clean_war">
+		<delete file="${app.dir}/${war.file}"></delete>
+		<delete dir="${app.dir}/${app.file}"></delete>
+	</target>
+	
+	<target name="mk_classes">
+		<mkdir dir="WebContent/WEB-INF/classes"/>
+		<mkdir dir="WebContent/WEB-INF/classes/configure"/>
+		<mkdir dir="WebContent/WEB-INF/classes/logs"/>
+		<mkdir dir="WebContent/WEB-INF/classes/messages"/>
+		<mkdir dir="WebContent/WEB-INF/classes/resources"/>
+		<mkdir dir="WebContent/WEB-INF/classes/sqls"/>
+		<mkdir dir="WebContent/WEB-INF/classes/validators"/>
+		<mkdir dir="WebContent/WEB-INF/classes/META-INF"/>
+	</target>
+	
+	<target name="cp_config" depends="mk_classes">
+		<copydir dest="WebContent/WEB-INF/classes/configure" src="${src.dir}/configure"></copydir>
+		<copydir dest="WebContent/WEB-INF/classes/logs" src="${src.dir}/logs"></copydir>
+		<copydir dest="WebContent/WEB-INF/classes/messages" src="${src.dir}/messages"></copydir>
+		<copydir dest="WebContent/WEB-INF/classes/resources" src="${src.dir}/resources"></copydir>
+		<copydir dest="WebContent/WEB-INF/classes/sqls" src="${src.dir}/sqls"></copydir>
+		<copydir dest="WebContent/WEB-INF/classes/validators" src="${src.dir}/validators"></copydir>
+		<copydir dest="WebContent/WEB-INF/classes/META-INF" src="${src.dir}/META-INF"></copydir>
+		<copy todir="WebContent/WEB-INF/classes">
+			<fileset dir="${src.dir}">
+				<include name="editor.html"/>
+				<include name="plugins.xml"/>
+				<include name="pushlet.properties"/>
+				<include name="sources.properties"/>
+				<include name="stencilset.json"/>
+			</fileset>
+		</copy>
+	</target>
+	
+	<target name="create_war" depends="clean_war">
+		<antcall target="pack"></antcall>
+		<copy file="${dist.dir}/${jar.file}" todir="WebContent/WEB-INF/lib" ></copy>
+		<antcall target="cp_config"></antcall>
+		<war destfile="${app.dir}/${war.file}">
+			<fileset dir="WebContent"></fileset>
+		</war>
+		<delete file="WebContent/WEB-INF/lib/${jar.file}"></delete>
+		<delete dir="WebContent/WEB-INF/classes"></delete>
+	</target>
+</project>

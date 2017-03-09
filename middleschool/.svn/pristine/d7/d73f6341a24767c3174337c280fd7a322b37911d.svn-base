@@ -1,0 +1,94 @@
+package cn.ffcs.txb.entity;
+
+import java.math.BigInteger;
+import java.util.Date;
+
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
+import javax.persistence.Table;
+
+import org.hibernate.annotations.DynamicUpdate;
+
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
+
+/**
+ * 签到记录实体
+ * @author Administrator
+ *
+ */
+@SuppressWarnings("serial")
+@Entity
+@Table(name="exchange")
+@DynamicUpdate(false)
+@JsonAutoDetect
+public class Exchange {
+	private int id;
+	private BigInteger user_id;
+	private int productid;
+	private Date exporttime;
+	private Date applytime;
+	private String status;
+	
+	public Exchange() {
+		
+	}
+	@Id
+	@GeneratedValue
+	@Column(name="id", columnDefinition="bigint(20) comment '主键ID'")
+	public int getId() {
+		return id;
+	}
+	@Column(name="user_id", unique=true, columnDefinition="bigint(20) comment '用户ID'")
+	public BigInteger getUser_id() {
+		return user_id;
+	}
+	@Column(name="exporttime", columnDefinition="int(20) comment '昵称'")
+	public Date getExporttime() {
+		return exporttime;
+	}
+	@Column(name="applytime", columnDefinition="int(20) comment '昵称'")
+	public Date getApplytime() {
+		return applytime;
+	}
+
+	
+	
+	public void setId(int id) {
+		this.id = id;
+	}
+	public void setUser_id(BigInteger user_id) {
+		this.user_id = user_id;
+	}
+
+	public void setExporttime(Date exporttime) {
+		this.exporttime = exporttime;
+	}
+	public void setApplytime(Date applytime) {
+		this.applytime = applytime;
+	}
+	@Column(name="product_id", columnDefinition="int(20) comment '昵称'")
+	public int getProductid() {
+		return productid;
+	}
+	public void setProductid(int productid) {
+		this.productid = productid;
+	}
+	
+	@Column(name="status", columnDefinition="int(20) comment '昵称'")
+	public String getStatus() {
+		return status;
+	}
+	public void setStatus(String status) {
+		this.status = status;
+	}
+	
+
+	
+	
+	
+	
+
+
+}

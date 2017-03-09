@@ -1,0 +1,23 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+	<sql-query name="SQL_OPTHIS_1">
+     <![CDATA[
+     	SELECT A.id,A.updateDate,A.username,A.logContent
+     	FROM opt_his A
+     	WHERE 1=1 
+     	/**<#if (username??) && (username?trim != "")>**/
+   		and A.username like  ?
+   		/**</#if>**/
+   		/**<#if (startTime??) && (startTime?trim != "")>**/
+   		and A.updateDate >=  ?
+   		/**</#if>**/
+   		/**<#if (endTime??) && (endTime?trim != "")>**/
+   		and A.updateDate <=  ?
+   		/**</#if>**/
+ 		ORDER BY A.id , A.updateDate desc
+     ]]>
+	</sql-query>
+	
+</hibernate-mapping>

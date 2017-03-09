@@ -1,0 +1,17 @@
+@charset "utf-8";
+
+/**页面ID**/
+.page_id{
+	padding-top:15px;
+	float:left;
+}
+
+/**页面标题样式**/
+.page_title{
+	font-size:15px;
+	padding-top:10px;
+	padding-bottom:30px;
+	text-align:center;
+	font-weight:bolder;
+	font-family: Verdana,Arial,Helvetica,sans-serif;
+}

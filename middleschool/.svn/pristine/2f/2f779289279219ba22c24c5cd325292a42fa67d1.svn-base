@@ -1,0 +1,78 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+	pageEncoding="UTF-8"%>
+<%@include file="/plugins/customer/jsp/appcommon.jsp"%>
+<!DOCTYPE>
+<html>
+<head>
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0;" name="viewport" />
+	<title>思明E学</title>
+	<link href="<%=path%>resources/app/common/css/style.css" rel="stylesheet">
+	<link href="<%=path%>resources/app/common/css/iosSelect.css" rel="stylesheet">
+</head>
+<body>
+	<div class="title-box">
+	<input type="hidden" id="checkStatus" value="${LOGIN_USER_INFO.status}"/>
+		<span class="g-left-icon">
+			<img src="<%=path%>resources/app/common/imgs/back.png"  onclick="Common.back(3,2);"/>
+		</span>
+		<h1 class="title">流量兑换</h1>
+		<span class="g-right-icon">
+				<button class="sign-btn"  onclick="Personal.getScoreRecord();"><img src="<%=path%>resources/app/common/imgs/search.png" /></button>
+		</span>
+	</div>
+	<div class="g-form-group-box">
+		<div class="g-user-box g-jifen-box">
+				<div class="g-user-img-box">
+					<img src="${LOGIN_USER_INFO.img}"  />
+				</div>
+				<div class="g-user-message-box">
+					<span class="user-name">我已有${LOGIN_USER_INFO.score}M币</span>
+					<span class="user-integral">已兑换${totalScore}M币</span>
+				</div>
+		</div>
+		<ul class="g-integral-group">
+		    <c:forEach items="${scoreExcahngeList}" var="item">
+				<li class="integral-list" onclick="Personal.submitScoreExchange('${item.keyword}')">
+					<span class="integral-message"><span class="red">${item.score}</span>M币换<span class="red">${item.flow}</span>流量</span>
+					<img src="<%=path%>resources/app/common/imgs/label.png" class="label-top" />
+				</li>
+		    </c:forEach>
+		</ul>
+	</div>
+	
+	<div class="popup-bg dis-none" id="div_information">
+		<div class="popup-box">
+			<div class="popup-message-box">
+				<p>请填写完整您的个人信息，稍后老师会审核您的资料。通过审核后再来兑换流量！</p>
+			</div>
+			<div class="popup-btn-box">
+				<button class="btn popup-close" onclick="Personal.scoreLessConfirm();">放弃</button>
+				<button class="btn popup-sure" onclick="Personal.studentInfo();">填写资料</button>
+			</div>
+		</div>
+	</div>
+	<div class="popup-bg dis-none" id="div_score">
+		<div class="popup-box">
+			<div class="popup-message-box">
+				<p>上课签到及刷题可以更多的获取积分</p>
+			</div>
+			<div class="popup-btn-box">
+				<button class="btn popup-close w-100 border-none"  onclick="Personal.scoreLessConfirm();">确定</button>
+			</div>
+		</div>
+	</div>
+<!--加载层组件-->
+<div id = "mask" class="g-loading-bg-box dis_none">
+	<div class="g-loading-box">
+		<div class="typing_loader"></div>
+		<p class="loading-text">努力加载中</p>
+	</div>
+</div>
+</body>
+	<script type="text/javascript" src="<%=path%>resources/app/common/js/width.js"></script>
+	<script type="text/javascript" src="<%=path%>resources/app/common/js/btn.js"></script>
+	<script type="text/javascript" src="<%=path%>resources/app/common/js/iosSelect.js"></script>
+	<script type="text/javascript" src="<%=path%>resources/app/common/js/iscroll.js"></script>
+</html>

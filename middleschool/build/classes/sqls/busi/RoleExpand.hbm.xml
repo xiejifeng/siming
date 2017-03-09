@@ -1,0 +1,69 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+	
+	<sql-query name="SQL_ROLEEXPAND_1">
+		<![CDATA[
+			select s.id,s.name,s.remark,r.insertDate,r.createName
+				 from sys_role s,role_expand r where 1=1
+				/**<#if (name??) && (name?trim != "")>**/ 
+					and s.name like ?
+				/**</#if>**/
+				  and s.id = r.roleId
+				 and  r.roleId in(select roleId from role_expand where createName = ?)
+		]]>
+	</sql-query>
+	<sql-query name="SQL_ROLEEXPAND_8">
+		<![CDATA[
+			select s.id,s.name,s.remark
+				 from sys_role s where 1=1
+				/**<#if (name??) && (name?trim != "")>**/ 
+					and s.name like ?
+				/**</#if>**/
+				
+		]]>
+	</sql-query>
+
+	<sql-query name="SQL_ROLEEXPAND_2">
+		<![CDATA[
+			select max(id) as roleId from sys_role
+		]]>
+	</sql-query>
+
+	<sql-query name="SQL_ROLEEXPAND_3">
+		<![CDATA[
+			insert into sys_role(name,remark) values(?,?)
+		]]>
+	</sql-query>
+	<sql-query name="SQL_ROLEEXPAND_4">
+		<![CDATA[
+			insert into role_expand(roleId,insertDate,createName) values(?,?,?)
+		]]>
+	</sql-query>
+	<sql-query name="SQL_ROLEEXPAND_5">
+		<![CDATA[
+			select name from sys_role where name = ?
+		]]>
+	</sql-query>
+	<sql-query name="SQL_ROLEEXPAND_6">
+		<![CDATA[
+			delete from role_expand where roleId = ?
+		]]>
+	</sql-query>
+	<sql-query name="SQL_ROLEEXPAND_7">
+		<![CDATA[
+			delete from sys_role where id = ?
+		]]>
+	</sql-query>
+	<sql-query name="SQL_ROLEEXPAND_9">
+		<![CDATA[
+			select role_id from sys_user_role where role_id = ?
+		]]>
+	</sql-query>
+	<sql-query name="SQL_ROLEEXPAND_10">
+		<![CDATA[
+			delete from sys_role_resource where role_id = ?
+		]]>
+	</sql-query>
+</hibernate-mapping>

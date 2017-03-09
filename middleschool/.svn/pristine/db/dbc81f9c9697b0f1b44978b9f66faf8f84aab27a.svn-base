@@ -1,0 +1,45 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+	<sql-query name="SQL_PRODUCT_1">
+     <![CDATA[
+		SELECT
+			p.*, sd.text AS statusname
+		FROM
+			product p,
+			sys_dictionary sd
+		WHERE
+			1 = 1
+		/**<#if (name??) && (name?trim != "")>**/
+		and p.name like  :name
+		/**</#if>**/
+		/**<#if (status??) && (status?trim != "")>**/
+		and p.status =  :status
+		/**</#if>**/
+		/**<#if (startTime??) && (startTime?trim != "")>**/
+		and p.createtime >=  :startTime
+		/**</#if>**/
+		/**<#if (endTime??) && (endTime?trim != "")>**/
+		and p.createtime <=  :endTime
+		/**</#if>**/
+		/**<#if (startScore??) && (startScore?trim != "")>**/
+		and p.score >=  :startScore
+		/**</#if>**/
+		/**<#if (endScore??) && (endScore?trim != "")>**/
+		and p.score <=  :endScore
+		/**</#if>**/
+		AND p.`status` = sd.`code`
+     ]]>
+	</sql-query>
+	<sql-query name="SQL_PRODUCT_2">
+	     <![CDATA[
+	        SELECT
+	*
+FROM
+	product_img pi
+WHERE
+	pi.product_id = ?
+	          ]]>
+	</sql-query>
+</hibernate-mapping>

@@ -1,0 +1,62 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+	pageEncoding="UTF-8"%>
+<%@include file="/plugins/customer/jsp/appcommon.jsp"%>
+<!DOCTYPE>
+<html>
+<head>
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0;" name="viewport" />
+	<title>思明E学</title>
+	<link href="<%=path%>resources/app/common/css/style.css" rel="stylesheet">
+	<link href="<%=path%>resources/app/common/css/iosSelect.css" rel="stylesheet">
+</head>
+	<body>
+	    <input type="hidden" value="${uuid}" id="uuid">
+	    <input type="hidden" value="${courseName}" id="courseName">
+		<div class="title-box">
+			<span class="g-left-icon" onclick="Common.back(5,2);">
+				<img src="<%=path%>resources/app/common/imgs/back.png" />
+			</span>
+			<h1 class="title">答题练习</h1>
+			<span class="g-right-icon">
+					<button class="sign-btn" onclick="Personal.index();"><img style="width: 0.4rem;" src="<%=path%>resources/app/common/imgs/qd.png" /></button>
+			</span>
+			<a name="top"></a>
+		</div>
+		<div class="g-form-group-box">
+			<div class="g-subject-text-box" id="topic_div">
+				<span class='icon-sub' id="subjectName">${courseName}</span>
+				<p class="subject-text" id="tmHtml"></p>
+				<div class="g-subject-answer-box" id="tmAnswerHtml">
+				</div>
+				<div class="g-go-top-box">
+					<a href="#top" class="go-top">
+						<img src="<%=path%>resources/app/common/imgs/go-top.png" />
+					</a>
+				</div>
+			</div>
+			<div class="g-form-group-box dis_none" id="result_div">
+
+		    </div>
+			<div class="g-btn-bottom-box tab-btn-3" id="singleButton">
+				<button class="sure-btn" onclick="Brush.submitResult();" id="resultSubmit">提交</button>
+			</div>
+			<div class="g-btn-bottom-box dis_none" id="doubleButton">
+				<button class="sure-btn"  onclick="Brush.submitResult();">继续刷题<tton>
+			</div>
+			<div class="g-btn-bottom-box dis_none" id="backButton">
+				<button class="sure-btn"   onclick="Common.back(5,2);">返回<tton>
+			</div>
+		</div>
+	</body>
+	<script type="text/javascript" src="<%=path%>resources/app/common/js/width.js"></script>
+	<script type="text/javascript" src="<%=path%>resources/app/common/js/btn.js"></script>
+	<script type="text/javascript">
+	$(document).ready(function(){ 
+		var uuid = $("#uuid").val();
+		var courseName = $("#courseName").val();
+		Brush.initTopicDetail(uuid,courseName);
+	});
+	</script>
+</html>

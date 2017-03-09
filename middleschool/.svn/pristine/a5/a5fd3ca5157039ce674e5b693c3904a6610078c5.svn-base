@@ -1,0 +1,257 @@
+package cn.ffcs.txb.entity;
+
+import java.util.Date;
+
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
+import javax.persistence.Table;
+
+import org.hibernate.annotations.DynamicUpdate;
+
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
+
+/**
+ * 签到记录实体
+ * @author Administrator
+ *
+ */
+@SuppressWarnings("serial")
+@Entity
+@Table(name="topicbank")
+@DynamicUpdate(false)
+@JsonAutoDetect
+public class TopicBank {
+
+	private int id;
+	private String Qid;
+	private String Xx;
+	private String SubjectId;
+	private String Coreid;
+	private String QtypeId;
+	private String Qrows;
+	private String Qcols;
+	private String Qtxt;
+	private String Kaodian;
+	private String Fenxi;
+	private String Jieda;
+	private String Dianpin;
+	private String Vlink;
+	private String Ieasy;
+	private String Iscore;
+	private String Qtype2Id;
+	private String Page;
+	private String Point;
+	private String QtypeParentId;
+	private String SubjectParentId;
+	private String SubQuests;
+	private String status;
+	private String Qopt;
+	private String Qok;
+	private String Qyear;
+	private String Qfrom;
+	private Date createtime;
+
+	public TopicBank() {
+	}
+	@Id
+	@GeneratedValue
+	@Column(name="id", columnDefinition="bigint(20) comment '主键ID'")
+	public int getId() {
+		return id;
+	}
+	@Column(name="Qid")
+	public String getQid() {
+		return Qid;
+	}
+	@Column(name="Xx")
+	public String getXx() {
+		return Xx;
+	}
+	@Column(name="SubjectId")
+	public String getSubjectId() {
+		return SubjectId;
+	}
+	@Column(name="Coreid")
+	public String getCoreid() {
+		return Coreid;
+	}
+	@Column(name="QtypeId")
+	public String getQtypeId() {
+		return QtypeId;
+	}
+	@Column(name="Qrows")
+	public String getQrows() {
+		return Qrows;
+	}
+	@Column(name="Qcols")
+	public String getQcols() {
+		return Qcols;
+	}
+	@Column(name="Qtxt")
+	public String getQtxt() {
+		return Qtxt;
+	}
+	@Column(name="Kaodian")
+	public String getKaodian() {
+		return Kaodian;
+	}
+	@Column(name="Fenxi")
+	public String getFenxi() {
+		return Fenxi;
+	}
+	@Column(name="Jieda")
+	public String getJieda() {
+		return Jieda;
+	}
+	@Column(name="Dianpin")
+	public String getDianpin() {
+		return Dianpin;
+	}
+	@Column(name="Vlink")
+	public String getVlink() {
+		return Vlink;
+	}
+	@Column(name="Ieasy")
+	public String getIeasy() {
+		return Ieasy;
+	}
+	@Column(name="Iscore")
+	public String getIscore() {
+		return Iscore;
+	}
+	@Column(name="Qtype2Id")
+	public String getQtype2Id() {
+		return Qtype2Id;
+	}
+	@Column(name="Page")
+	public String getPage() {
+		return Page;
+	}
+	@Column(name="Point")
+	public String getPoint() {
+		return Point;
+	}
+	@Column(name="QtypeParentId")
+	public String getQtypeParentId() {
+		return QtypeParentId;
+	}
+	@Column(name="SubjectParentId")
+	public String getSubjectParentId() {
+		return SubjectParentId;
+	}
+	@Column(name="SubQuests")
+	public String getSubQuests() {
+		return SubQuests;
+	}
+	@Column(name="status")
+	public String getStatus() {
+		return status;
+	}
+	@Column(name="createtime", columnDefinition="createtime comment '创建时间'")
+	public Date getCreatetime() {
+		return createtime;
+	}
+	@Column(name="Qopt")
+	public String getQopt() {
+		return Qopt;
+	}
+	@Column(name="Qok")
+	public String getQok() {
+		return Qok;
+	}
+	@Column(name="Qyear")
+	public String getQyear() {
+		return Qyear;
+	}
+	@Column(name="Qfrom")
+	public String getQfrom() {
+		return Qfrom;
+	}
+	public void setId(int id) {
+		this.id = id;
+	}	
+	public void setQid(String qid) {
+		Qid = qid;
+	}
+	public void setXx(String xx) {
+		Xx = xx;
+	}
+	public void setSubjectId(String subjectId) {
+		SubjectId = subjectId;
+	}
+	public void setCoreid(String coreid) {
+		Coreid = coreid;
+	}
+	public void setQtypeId(String qtypeId) {
+		QtypeId = qtypeId;
+	}
+	public void setQrows(String qrows) {
+		Qrows = qrows;
+	}
+	public void setQcols(String qcols) {
+		Qcols = qcols;
+	}
+	public void setQtxt(String qtxt) {
+		Qtxt = qtxt;
+	}
+	public void setKaodian(String kaodian) {
+		Kaodian = kaodian;
+	}
+	public void setFenxi(String fenxi) {
+		Fenxi = fenxi;
+	}
+	public void setJieda(String jieda) {
+		Jieda = jieda;
+	}
+	public void setDianpin(String dianpin) {
+		Dianpin = dianpin;
+	}
+	public void setVlink(String vlink) {
+		Vlink = vlink;
+	}
+	public void setIeasy(String ieasy) {
+		Ieasy = ieasy;
+	}
+	public void setIscore(String iscore) {
+		Iscore = iscore;
+	}
+	public void setQtype2Id(String qtype2Id) {
+		Qtype2Id = qtype2Id;
+	}
+	public void setPage(String page) {
+		Page = page;
+	}
+	public void setPoint(String point) {
+		Point = point;
+	}
+	public void setQtypeParentId(String qtypeParentId) {
+		QtypeParentId = qtypeParentId;
+	}
+	public void setSubjectParentId(String subjectParentId) {
+		SubjectParentId = subjectParentId;
+	}
+	public void setSubQuests(String subQuests) {
+		SubQuests = subQuests;
+	}
+	public void setStatus(String status) {
+		this.status = status;
+	}
+	public void setCreatetime(Date createtime) {
+		this.createtime = createtime;
+	}
+	public void setQopt(String qopt) {
+		Qopt = qopt;
+	}
+	public void setQok(String qok) {
+		Qok = qok;
+	}
+	public void setQyear(String qyear) {
+		Qyear = qyear;
+	}
+	public void setQfrom(String qfrom) {
+		Qfrom = qfrom;
+	}
+	
+}

@@ -1,0 +1,11 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+	<sql-query name="SQL_TIMINGBROADCASTISSUE_1">
+     <![CDATA[
+     	select * from broadcast_info t where t.issueType = '1' and t.broadcastType = '0'
+     ]]>
+	</sql-query>
+
+</hibernate-mapping>

@@ -1,0 +1,95 @@
+package cn.ffcs.txb.entity;
+
+import java.util.Date;
+
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
+import javax.persistence.Table;
+
+import org.hibernate.annotations.DynamicUpdate;
+
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
+
+/**
+ * 
+ * @author Administrator
+ *
+ */
+@SuppressWarnings("serial")
+@Entity
+@Table(name="schart")
+@DynamicUpdate(false)
+@JsonAutoDetect
+public class Schart {
+	private int id;
+	private Date createtime;
+	private String school_id;
+	private String arttype_id;
+	private String city_id;
+	private String status;
+	private int priority;
+	
+	public Schart() {
+		
+	}
+	@Id
+	@GeneratedValue
+	@Column(name="id")
+	public int getId() {
+		return id;
+	}
+	@Column(name="createtime", columnDefinition="createtime comment '创建时间'")
+	public Date getCreatetime() {
+		return createtime;
+	}
+	@Column(name="school_id", columnDefinition="createtime comment '创建时间'")
+	public String getSchool_id() {
+		return school_id;
+	}
+	@Column(name="arttype_id", columnDefinition="createtime comment '创建时间'")
+	public String getArttype_id() {
+		return arttype_id;
+	}
+	
+	@Column(name="city_id", columnDefinition="createtime comment '创建时间'")
+	public String getCity_id() {
+		return city_id;
+	}
+	@Column(name="status", columnDefinition="createtime comment '创建时间'")
+	public String getStatus() {
+		return status;
+	}
+	@Column(name="priority", columnDefinition="createtime comment '创建时间'")
+	public int getPriority() {
+		return priority;
+	}
+	public void setPriority(int priority) {
+		this.priority = priority;
+	}
+	public void setCity_id(String city_id) {
+		this.city_id = city_id;
+	}
+	public void setStatus(String status) {
+		this.status = status;
+	}
+	public void setSchool_id(String school_id) {
+		this.school_id = school_id;
+	}
+	public void setArttype_id(String arttype_id) {
+		this.arttype_id = arttype_id;
+	}
+	public void setId(int id) {
+		this.id = id;
+	}
+	public void setCreatetime(Date createtime) {
+		this.createtime = createtime;
+	}
+	
+	
+	
+	
+
+
+}

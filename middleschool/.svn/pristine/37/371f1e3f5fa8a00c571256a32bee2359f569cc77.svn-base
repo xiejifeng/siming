@@ -1,0 +1,29 @@
+$(function(){
+	$("#search").jButton({
+		plain:false,
+		iconCls:'icon-search'
+	});
+	$("#reset").jButton({
+		plain:false,
+		iconCls:'icon-undo'
+	});
+	$("#remark").validate({
+		required:false,
+		validType:'valid["zh_length[1,32]"]'
+	});
+	$("#categoryCode").validate({
+		required:false,
+		validType:'regexp',
+		regular:/^\w{2}$/,
+		invalidMessage:'dict.category.categoryCode'
+	});
+	
+	$("#reset").click(function(){
+		$("#frm").ajaxForm("clear"); 
+	});
+	
+	$("#search").click(function(){
+		$("#dict_grid").jTreegrid("reload",null,$.formItems($("#frm")));
+		$("#search_dict_win").closeWindow();
+	});
+});

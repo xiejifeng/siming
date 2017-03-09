@@ -1,0 +1,38 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+	pageEncoding="UTF-8"%>
+<%@include file="/plugins/customer/jsp/appcommon.jsp"%>
+<!DOCTYPE>
+<html>
+<head>
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0;" name="viewport" />
+	<title>思明E学</title>
+	<link href="<%=path%>resources/app/common/css/style.css" rel="stylesheet">
+	<link href="<%=path%>resources/app/common/css/iosSelect.css" rel="stylesheet">
+</head>
+	<body>
+		<div class="title-box">
+			<span class="g-left-icon"  onclick="Common.back(2,2);">
+				<img src="<%=path%>resources/app/common/imgs/back.png" />
+			</span>
+			<h1 class="title" id="tit_subject">错题回顾</h1>
+			<span class="g-right-icon">
+					<button class="sign-btn" onclick="Personal.index();"><img style="width: 0.4rem;" src="<%=path%>resources/app/common/imgs/qd.png" /></button>
+			</span>
+		</div>
+		<div class="g-form-group-box">
+			<ul class="g-sub-list-box" >
+			  <c:forEach items="${errorList}" var="item">
+			  	<li class="sub-list" id="${item.topic_id}" onclick="Brush.initGetErrorTopicDetail(${item.topic_id},'${item.course_id}');">
+					<img src="<%=path%>resources/app/common/imgs/${item.imgname}" class="icon-sub" />
+					<span class="sub-title">${item.createtime}</span>
+					<img src="<%=path%>resources/app/common/imgs/right.png" class="right-arrow" />
+				</li>
+			  </c:forEach>
+			</ul>
+		</div>
+	</body>
+	<script type="text/javascript" src="<%=path%>resources/app/common/js/width.js"></script>
+	<script type="text/javascript" src="<%=path%>resources/app/common/js/btn.js"></script>
+</html>

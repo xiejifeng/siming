@@ -1,0 +1,859 @@
+img{ vertical-align:middle;}
+a{color:#666666; text-decoration:none;}
+a:hover{color:#666666; text-decoration:underline;}
+body {
+	margin: 0px;
+	padding: 0px;
+	font-size: 13px;
+	line-height: 26px;
+	font-family: Microsoft YaHei, Arial;
+	color: #666666;
+	background: #f8f8f8;
+}
+
+.loginBg {
+	background: #e3e4e6;
+}
+
+a {
+	color: #666666;
+	text-decoration: none;
+}
+
+a:hover {
+	color: #666666;
+	text-decoration: underline;
+}
+
+select,input {
+	vertical-align: middle;
+	font-family: Microsoft YaHei, Arial;
+	cursor: pointer;
+}
+
+img {
+	vertical-align: middle;
+}
+
+ul {
+	margin: 0px;
+	padding: 0px;
+}
+
+ul li {
+	list-style-type: none;
+}
+
+.floatL {
+	float: left
+}
+
+.floatR {
+	float: right;
+}
+
+.clear {
+	clear: both;
+}
+
+.blue {
+	color: #169bd5;
+}
+
+.red {
+	color: #ff0000;
+}
+
+.btnLogin {
+	font-size: 16px;
+	text-align: center;
+	height: 36px;
+	line-height: 36px;
+	padding: 0px 10px;
+	color: #FFFFFF;
+	border: none;
+	background: #ff9600;
+	float: initial;
+	width: 260px;
+}
+
+.btnOrange {
+	font-size: 14px;
+	text-align: center;
+	height: 24px;
+	line-height: 20px;
+	padding: 0px 10px;
+	color: #FFFFFF;
+	border: none;
+	background: #ff9600;
+}
+
+.btnBlue {
+	font-size: 14px;
+	text-align: center;
+	height: 24px;
+	line-height: 20px;
+	padding: 0px 10px;
+	color: #FFFFFF;
+	border: none;
+	background: #48a4e0;
+}
+
+.btnGray {
+	cursor:default;
+	font-size: 14px;
+	text-align: center;
+	height: 24px;
+	line-height: 20px;
+	padding: 0px 10px;
+	color: #FFFFFF;
+	border: none;
+	background: #C9C9C9;
+}
+
+.btnOrange0 {
+	font-size: 14px;
+	text-align: center;
+	line-height: 20px;
+	padding: 7px 25px;
+	color: #FFFFFF;
+	border: none;
+	background: #ff9600;
+	margin: 10px 0px;
+}
+
+.btnBlue0 {
+	font-size: 14px;
+	text-align: center;
+	line-height: 20px;
+	padding: 7px 25px;
+	color: #FFFFFF;
+	border: none;
+	background: #48a4e0;
+	margin: 10px 0px;
+}
+
+.btnGray0 {
+	font-size: 14px;
+	text-align: center;
+	line-height: 20px;
+	padding: 7px 25px;
+	color: #FFFFFF;
+	border: none;
+	background: #C9C9C9;
+	margin: 10px 0px;
+}
+
+.header {
+	width: 100%;
+	height: 43px;
+	line-height: 43px;
+	color: #FFFFFF;
+	background: url(../img/headerBg.jpg) repeat-x top left;
+}
+
+.header .logo {
+	float: left;
+	font-size: 16px;
+	font-weight: bold;
+	padding-left: 20px;
+}
+
+.header .userInfo {
+	float: right;
+	text-align: right;
+	padding-right: 20px;
+}
+
+.header .userInfo a {
+	color: #FFFFFF;
+}
+
+.header .userInfo a:hover {
+	color: #FFFFFF;
+	text-decoration: none;
+}
+
+.login {
+	width: 450px;
+	height: 490px;
+	font-size: 14px;
+	color: #666666;
+	position: absolute;
+	left: 50%;
+	top: 50%;
+	margin-left: -225px;
+	margin-top: -245px;
+}
+
+.login .WelcomeLogin {
+	font-size: 18px;
+	line-height: 30px;
+	text-align: center;
+	margin-bottom: 20px;
+}
+
+.login .WelcomeLogin strong {
+	font-size: 48px;
+	color: #2389c3;
+	font-weight: normal;
+}
+
+.login .WelcomeLogin span {
+	font-size: 48px;
+}
+
+.login .WelcomeLogin p {
+	font-size: 33px;
+	margin: 0px;
+	padding: 20px 0px;
+}
+
+.login .loginBox {
+	border: 1px solid #CCCCCC;
+    background: #FFFFFF;
+    border-radius: 8px;
+    overflow: hidden;
+
+}
+
+.login .loginBox .title {
+	font-size: 16px;
+	line-height: 40px;
+	padding: 0px 20px;
+	border-bottom: 1px solid #CCCCCC;
+	background: #f8f8f8;
+	text-align: center;
+}
+
+.login .loginBox .con {
+	padding: 20px;
+	text-align: center;
+}
+
+.login .loginBox .con .inputBox {
+	line-height: 30px;
+    border: 1px solid #CCCCCC;
+    background: #f8f8f8;
+    border-radius: 6px;
+    padding: 20px;
+    margin-bottom: 10px;
+}
+
+.inputUser {
+	width: 250px;
+	height: 40px;
+	line-height: 40px;
+	font-size: 14px;
+	color: #888888;
+	border: 1px solid #CCCCCC;
+	padding: 0px 6px 0px 30px;
+	background: #fafafa url(../img/iconUser.jpg) no-repeat left;
+	margin-bottom: 5px;
+	border-radius: 4px;
+}
+
+.iconWord {
+	width: 250px;
+    height: 40px;
+    line-height: 40px;
+    font-size: 14px;
+    color: #888888;
+    border: 1px solid #CCCCCC;
+    padding: 0px 6px 0px 30px;
+    background: #fafafa url(../img/iconWord.jpg) no-repeat left;
+    margin-bottom: 5px;
+    border-radius: 4px;
+}
+
+.welcome {
+	margin: 80px auto 0px auto;
+	width: 500px;
+	height: 160px;
+	padding: 190px 0px 0px 290px;
+	font-size: 18px;
+	background: url(../img/welcome.jpg) no-repeat top left;
+}
+
+.welcome h1 {
+	font-size: 30px;
+}
+
+.contain {
+	margin: 0px auto;
+    padding: 0px;
+    position: absolute;
+	bottom: 0px;
+    top: 43px;
+    width: 100%;
+}
+
+.left {
+	position: absolute;
+	height: 100%;
+	border-right: 1px solid #cccccc;
+	width: 187px;
+	z-index: 1;
+	background: #f8f8f8;
+	overflow: hidden;
+}
+
+.left .currentMenu {
+	display: inline-block;
+	width: 155px;
+	padding-left: 32px;
+	height: 39px;
+	line-height: 39px;
+	color: #439ede;
+}
+
+.left .mymenu {
+	clear: both;
+}
+
+.left .mymenu a {
+	display: inline-block;
+	width: 155px;
+	padding-left: 32px;
+	height: 39px;
+	line-height: 39px;
+	cursor: pointer;
+}
+
+.left .mymenu a:hover {
+	color: #439ede;
+	text-decoration: none;
+}
+
+.left .menu1 a {
+	background: url(../img/menu1.jpg) no-repeat left top;
+}
+
+.left .menu1 a:hover {
+	background: url(../img/menu1_hover.jpg) no-repeat left top;
+}
+
+.left .menu2 a {
+	background: url(../img/menu2.jpg) no-repeat left top;
+}
+
+.left .menu2 a:hover {
+	background: url(../img/menu2_hover.jpg) no-repeat left top;
+}
+
+.left .menu3 a {
+	background: url(../img/menu3.jpg) no-repeat left top;
+}
+
+.left .menu3 a:hover {
+	background: url(../img/menu3_hover.jpg) no-repeat left top;
+}
+
+.left .menu4 a {
+	background: url(../img/menu4.jpg) no-repeat left top;
+}
+
+.left .menu4 a:hover {
+	background: url(../img/menu4_hover.jpg) no-repeat left top;
+}
+
+.left .menu5 a {
+	background: url(../img/menu5.jpg) no-repeat left top;
+}
+
+.left .menu5 a:hover {
+	background: url(../img/menu5_hover.jpg) no-repeat left top;
+}
+.left .menu6 a {
+	background: url(../img/menu6.jpg) no-repeat left top;
+}
+
+.left .menu6 a:hover {
+	background: url(../img/menu6_hover.jpg) no-repeat left top;
+}
+.left .menu7 a {
+	background: url(../img/menu7.jpg) no-repeat left top;
+}
+
+.left .menu7 a:hover {
+	background: url(../img/menu7_hover.jpg) no-repeat left top;
+}
+.left .menu1 {
+	background: url(../img/menu1_hover.jpg) no-repeat left top;
+}
+
+.left .menu2 {
+	background: url(../img/menu2_hover.jpg) no-repeat left top;
+}
+
+.left .menu3 {
+	background: url(../img/menu3_hover.jpg) no-repeat left top;
+}
+
+.left .menu4 {
+	background: url(../img/menu4_hover.jpg) no-repeat left top;
+}
+
+.left .menu5 {
+	background: url(../img/menu5_hover.jpg) no-repeat left top;
+}
+.left .menu6 {
+	background: url(../img/menu6_hover.jpg) no-repeat left top;
+}
+.left .menu7 {
+	background: url(../img/menu7_hover.jpg) no-repeat left top;
+}
+
+.left .menu8 {
+	background: url(../img/menu8_hover.jpg) no-repeat left top;
+}
+
+.left .menu8 a {
+	background: url(../img/menu8.jpg) no-repeat left top;
+}
+
+.left .menu8 a:hover {
+	background: url(../img/menu8_hover.jpg) no-repeat left top;
+}
+.left .menu9 {
+	background: url(../img/menu9_hover.jpg) no-repeat left top;
+}
+
+.left .menu9 a {
+	background: url(../img/menu9.jpg) no-repeat left top;
+}
+
+.left .menu9 a:hover {
+	background: url(../img/menu9_hover.jpg) no-repeat left top;
+}
+
+.left .menu10 {
+	background: url(../img/menu10_hover.jpg) no-repeat left top;
+}
+
+.left .menu10 a {
+	background: url(../img/menu10.jpg) no-repeat left top;
+}
+
+.left .menu10 a:hover {
+	background: url(../img/menu10_hover.jpg) no-repeat left top;
+}
+
+.left .menu11 {
+	background: url(../img/menu11_hover.jpg) no-repeat left top;
+}
+
+.left .menu11 a {
+	background: url(../img/menu11.jpg) no-repeat left top;
+}
+
+.left .menu11 a:hover {
+	background: url(../img/menu11_hover.jpg) no-repeat left top;
+}
+
+.navSub {
+	float: left;
+	padding: 5px;
+	margin: 0px;
+	width: 177px;
+	background: none;
+}
+
+.navSub .lineNav a {
+	display: block;
+	width: 137px;
+	color: #666666;
+	height: 35px;
+	line-height: 35px;
+	padding: 0px 20px;
+	margin-bottom: 1px;
+	background: #f8f8f8;
+	background-image: none;
+	cursor: pointer;
+}
+
+.navSub .lineNav a:hover {
+	display: block;
+	width: 137px;
+	color: #439ede;
+	height: 35px;
+	line-height: 35px;
+	padding: 0px 20px;
+	margin-bottom: 1px;
+	background: #efefef;
+	cursor: pointer;
+	text-decoration: none;
+}
+
+.navSub .lineNavCurrent {
+	color: #439ede;
+	width: 137px;
+	height: 35px;
+	line-height: 35px;
+	padding: 0px 20px;
+	margin-bottom: 1px;
+	background: #efefef;
+	background-image: none;
+	cursor: pointer;
+}
+
+.right {
+	height: 99%;
+	min-height: 400px;
+	padding: 0px 0px 0px 0px;
+	padding-left: 188px;
+	left: 0px;
+	right: 0px;
+	z-index: -1;
+}
+
+.tabNav {
+	height: 39px;
+	line-height: 39px;
+	padding: 0px 10px;
+	text-align: center;
+	background: url(../img/tabNavBg.jpg) repeat-x top left;
+}
+
+.tabNav ul {
+	
+}
+
+.tabNav ul li {
+	
+}
+
+.tabNav .tabName {
+	float: left;
+	display: inline-block;
+	margin-right: 5px;
+}
+
+.tabNav .tabName a {
+	float: left;
+	display: inline-block;
+	width: 108px;
+	height: 39px;
+	line-height: 39px;
+	margin-right: 5px;
+}
+
+.tabNav .tabName a:hover {
+	color: #439ede;
+	background: url(../img/tabNav.jpg) no-repeat left top;
+	text-decoration: none;
+}
+
+.tabNav .currentNav {
+	float: left;
+	display: inline-block;
+	width: 108px;
+	height: 39px;
+	line-height: 39px;
+	margin: 0px 5px 0px 0px;
+	color: #439ede;
+	background: url(../img/tabNav.jpg) no-repeat left top;
+	margin-right: 5px;
+}
+
+.search {
+	height: 35px;
+	line-height: 30px;
+	border: 1px solid #e1e1e1;
+	padding: 0px 10px;
+	background: #f3f3f3;
+	margin: 10px;
+}
+
+.search_white {
+	height: 35px;
+	line-height: 30px;
+	border: 0px;
+	padding: 0px 10px;
+	margin: 10px;
+}
+
+.inputUserName {
+	width: 90px;
+	height: 24px;
+	line-height: 24px;
+	color: #888888;
+	border: 1px solid #e1e1e1;
+	padding: 0px 5px;
+}
+
+.inputUserName2 {
+	width: 200px;
+}
+
+.inputDay {
+	width: 40px;
+	height: 24px;
+	line-height: 24px;
+	text-align: center;
+	color: #888888;
+	border: 1px solid #e1e1e1;
+	padding: 0px 24px 0px 5px;
+	background: #ffffff url(../img/iconDay.jpg) no-repeat center right;
+}
+
+.selectMenu {
+	width: 140px;
+	height: 30px;
+	line-height: 30px;
+	color: #888888;
+}
+
+.tableDiv {
+	padding: 0px 10px;
+}
+
+thead {
+	height: 36px;
+	line-height: 36px;
+	text-align: center;
+	color: #FFFFFF;
+	background: url(../img/thead.jpg) repeat-x top left;
+}
+
+.tdW40 {
+	width: 40px;
+}
+
+.tdW70 {
+	width: 70px;
+}
+
+.tdW80 {
+	width: 80px;
+}
+
+.tdW150 {
+	width: 150px;
+}
+
+.tdW200 {
+	width: 200px;
+}
+
+.tdW250 {
+	width: 250px;
+}
+
+.tdW330 {
+	width: 330px;
+}
+
+.tdW610 {
+	width: 610px;
+}
+
+.alignL {
+	text-align: left;
+}
+
+.alignR {
+	text-align: right;
+}
+
+td {
+	line-height: 35px;
+	/* text-align: center; */
+}
+
+.page {
+	padding: 10px;
+	font-size: 14px;
+	text-align: left;
+}
+
+.page .PrevPrev a {
+	background: url(../img/iconPrevPrev.jpg) no-repeat center center;
+}
+
+.page .PrevPrev a:hover {
+	background: url(../img/iconPrevPrev.jpg) no-repeat center center;
+}
+
+.page .pagePrev a {
+	background: url(../img/iconPrev.jpg) no-repeat center center;
+}
+
+.page .pagePrev a:hover {
+	background: url(../img/iconPrev.jpg) no-repeat center center;
+}
+
+.page .pageNext a {
+	background: url(../img/iconNext.jpg) no-repeat center center;
+}
+
+.page .pageNext a:hover {
+	background: url(../img/iconNext.jpg) no-repeat center center;
+}
+
+.page .NextNext a {
+	background: url(../img/iconNextNext.jpg) no-repeat center center;
+}
+
+.page .NextNext a:hover {
+	background: url(../img/iconNextNext.jpg) no-repeat center center;
+}
+
+.page .Refresh a {
+	background: url(../img/iconRefresh.jpg) no-repeat center center;
+}
+
+.page .Refresh a:hover {
+	background: url(../img/iconRefresh.jpg) no-repeat center center;
+}
+
+.page a {
+	position: relative;
+	width: 28px;
+	display: inline-block;
+	vertical-align: middle;
+	height: 28px;
+	line-height: 28px;
+	padding: 0px 0px;
+	color: #666666;
+	border: 1px solid #cccccc;
+	background: #f7f7f7;
+	margin: 0px 5px;
+}
+
+.page a:hover {
+	width: 28px;
+	display: inline-block;
+	vertical-align: middle;
+	height: 28px;
+	line-height: 28px;
+	padding: 0px 0px;
+	color: #666666;
+	border: 1px solid #999999;
+	background: #f7f7f7;
+	margin: 0px 5px;
+	text-decoration: none;
+}
+
+.page .inputPage {
+	width: 60px;
+	height: 22px;
+	text-align: center;
+}
+
+.page .current {
+	height: 28px;
+	line-height: 28px;
+	color: #FFFFFF;
+	border: 1px solid #1590d3;
+	background: #1aa1ea;
+}
+
+.Box {
+	margin: 10px;
+	background: #FFFFFF;
+	border: 1px solid #e1e1e1;
+}
+
+.Window{
+	margin: 0px;
+	background: #FFFFFF;
+	border: 0px solid #e1e1e1;
+}
+
+.Box .title {
+	padding: 0px 10px;
+	height: 36px;
+	line-height: 36px;
+	color: #FFFFFF;
+	background: url(../img/thead.jpg) repeat-x top left;
+}
+
+.Box .con {
+	padding: 10px;
+}
+
+.Box .con td {
+	text-align: left;
+}
+
+.textareaW600 {
+	width: 600px;
+	margin-bottom: 10px;
+}
+
+#newUser {
+	position: absolute;
+	width: 580px;
+	height: 480px;
+	left: 50%;
+	top: 50%;
+	margin-left: -290px; /*璁剧疆涓哄搴︾殑涓�崐*/
+	margin-top: -240px; /*璁剧疆涓洪珮搴︾殑涓�崐*/
+	z-index: 1;
+}
+
+#EditorUser {
+	position: absolute;
+	width: 580px;
+	height: 380px;
+	left: 50%;
+	top: 50%;
+	margin-left: -290px; /*璁剧疆涓哄搴︾殑涓�崐*/
+	margin-top: -190px; /*璁剧疆涓洪珮搴︾殑涓�崐*/
+	z-index: 1;
+}
+
+#NewRole {
+	position: absolute;
+	width: 440px;
+	height: 380px;
+	left: 50%;
+	top: 50%;
+	margin-left: -220px; /*璁剧疆涓哄搴︾殑涓�崐*/
+	margin-top: -190px; /*璁剧疆涓洪珮搴︾殑涓�崐*/
+	z-index: 1;
+}
+
+.Box .con .tdW80 {
+	width: 80px;
+	text-align: right;
+}
+
+.Box .title strong {
+	float: right;
+	display: block;
+	cursor: pointer;
+	padding-top: 5px;
+}
+
+.inputW180 {
+	width: 160px;
+	height: 30px;
+	line-height: 30px;
+	color: #999999;
+	border: 1px solid #e1e1e1;
+	padding: 0px 10px;
+	margin-bottom: 10px;
+}
+.inputW300 {
+	width: 300px;
+	height: 30px;
+	line-height: 30px;
+	color: #999999;
+	border: 1px solid #e1e1e1;
+	background: #f8f8f8;
+	padding: 0px 10px;
+	margin-bottom: 10px;
+}
+
+.divW180 {
+	width: 180px;
+	height: 170px;
+	border: 1px solid #e1e1e1;
+	background: #eeffed;
+	overflow-y: scroll;
+}
+.error{
+	color: red;
+}

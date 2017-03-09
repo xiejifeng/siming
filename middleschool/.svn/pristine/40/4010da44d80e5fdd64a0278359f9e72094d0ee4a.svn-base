@@ -1,0 +1,430 @@
+package cn.ffcs.txb.app.controller.main;
+
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import javax.annotation.Resource;
+import javax.mail.Session;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+
+import org.activiti.engine.impl.util.json.JSONArray;
+import org.activiti.engine.impl.util.json.JSONObject;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
+
+import com.mongodb.util.Hash;
+import com.taobao.api.ApiException;
+
+import cn.ffcs.srp.app.dictionary.entity.Dictionary;
+import cn.ffcs.srp.util.i18n.GlobalUtil;
+import cn.ffcs.txb.common.api.LeApi;
+import cn.ffcs.txb.common.model.Constant;
+import cn.ffcs.txb.common.util.BaseService;
+import cn.ffcs.txb.common.util.FileOperateUtil;
+import cn.ffcs.txb.common.util.JsonUtil;
+import cn.ffcs.txb.common.util.LetvCloudV1;
+import cn.ffcs.txb.common.util.PinyinUtils;
+import cn.ffcs.txb.common.util.SmsUtil;
+import cn.ffcs.txb.common.util.Util;
+import cn.ffcs.txb.common.util.ValidateCode;
+import cn.ffcs.txb.service.paper.IPaperService;
+import cn.ffcs.txb.service.personal.IPersonalService;
+
+@Controller
+@RequestMapping(value = "/appLogin")
+public class AppLoginController {
+	
+	@Resource
+	private IPersonalService  personalService;
+	@Resource
+	private IPaperService  paperService;
+    /**
+     * 
+     * 功能描述：初始化登录页面
+     *
+     * @author ：余冬平
+     * 创建日期 ：2014年12月24日 上午10:16:59
+     *
+     * @return
+     *
+     * 修改历史 ：(修改人，修改时间，修改原因/内容)
+     */
+    @RequestMapping(value="/initLogin.html")
+    public String initLogin(){
+        return "main/login";
+    }
+    @RequestMapping(value="/advertisementPage.html")
+    public String advertisementPage(@RequestParam Map<String, Object> reqMap ,HttpServletRequest request){
+    	request.setAttribute("url", reqMap.get("url"));
+    	return "main/advertisementPage";
+    }
+    /**
+     * 
+     * 功能描述：初始化登录页面
+     *
+     * @author ：余冬平
+     * 创建日期 ：2014年12月24日 上午10:16:59
+     *
+     * @return
+     *
+     * 修改历史 ：(修改人，修改时间，修改原因/内容)
+     */
+    @RequestMapping(value="/main.html")
+    public String showUpdatePwd(){
+    	return "main/main";
+    }
+    /**
+     * 
+     * 功能描述：初始化登录页面
+     *
+     * @author ：余冬平
+     * 创建日期 ：2014年12月24日 上午10:16:59
+     *
+     * @return
+     *
+     * 修改历史 ：(修改人，修改时间，修改原因/内容)
+     * @throws Exception 
+     */
+    @RequestMapping(value="/index.html")
+    public String index(HttpServletRequest request) throws Exception{
+    	Map<String, Object> userInfo = (Map<String, Object>)request.getSession().getAttribute(Constant.LOGIN_USER_INFO);
+    	if(userInfo!=null){
+        	String result  =  BaseService.doGet(GlobalUtil.getValue("topic_get_category"));
+        	JSONObject  json = new JSONObject(result);
+        	if("ok".equals(json.get("status"))){
+        		List<Map<String, Object>> data = JsonUtil.parseToListMap(json.getJSONArray("data"));
+        		for(Map<String, Object> map:data){
+        			if("小学".equals(map.get("label"))){
+        				JSONArray array = new JSONArray(map.get("children").toString());
+        			    for(int i=0;i<array.length();i++){
+        			    	List<Map<String, Object>> paperdata = this.paperService.getPaperInfoBySubjectId(array.getJSONObject(i).get("id").toString(),userInfo.get("userId"));
+        			    	request.setAttribute(PinyinUtils.getPinYinHeadChar(array.getJSONObject(i).get("label").toString()), paperdata);
+        			    }
+        			}
+        		}
+        		request.setAttribute("subject",data); 
+        	}
+        	Object object = request.getSession().getAttribute(Constant.TOPICINFO);
+        	if(object!=null)
+        	   request.setAttribute("hasTopic", "1");
+        	else
+        	   request.setAttribute("hasTopic", "0");
+        	
+    	}else{
+        	String result  =  BaseService.doGet(GlobalUtil.getValue("topic_get_category"));
+        	JSONObject  json = new JSONObject(result);
+        	if("ok".equals(json.get("status"))){
+        		List<Map<String, Object>> data = JsonUtil.parseToListMap(json.getJSONArray("data"));
+        		for(Map<String, Object> map:data){
+        			if("小学".equals(map.get("label"))){
+        				JSONArray array = new JSONArray(map.get("children").toString());
+        			    for(int i=0;i<array.length();i++){
+        			    	List<Map<String, Object>> paperdata = this.paperService.getPaperInfoBySubjectId(array.getJSONObject(i).get("id").toString());
+        			    	request.setAttribute(PinyinUtils.getPinYinHeadChar(array.getJSONObject(i).get("label").toString()), paperdata);
+        			    }
+        			}
+        		}
+        		request.setAttribute("subject",data); 
+        	}
+    	}	
+    	return "main/index_student";
+    }
+    
+    /**
+     * 登录
+     * @param tagName
+     * @return
+     */
+	@RequestMapping(value = "/login.html")
+	@ResponseBody
+	public Map<String, Object> login(@RequestParam Map<String, Object> reqMap ,HttpServletRequest request) {
+		
+		String username = reqMap.get("username").toString();
+		String password = reqMap.get("password").toString();
+		String code = reqMap.get("code").toString();
+		String ipAddr = Util.getIpAddr(request);
+		int errorCount = request.getSession().getAttribute(Constant.LOGIN_ERR_COUNT)==null?0:(int)request.getSession().getAttribute(Constant.LOGIN_ERR_COUNT);
+		if(errorCount>=5){
+			String loginCode  = request.getSession().getAttribute(Constant.LOGIN_VAl_CODE).toString();
+			if(!code.equals(loginCode)){
+				Map<String, Object> result = new HashMap<>();
+				result.put("resultCode", "1");
+				result.put("resultMsg", "验证输入错误，请重新输入");
+			}
+		}
+        //判断当前用户名 手机号是否存在
+		Map<String, Object>  userInfo  = personalService.checkLoginInfo(username, password,ipAddr);
+		String resultCode = userInfo.get("resultCode").toString();
+        if(Constant.SUCC_CODE.equals(resultCode)){
+            String status =userInfo.get("status").toString();
+            if("1703".equals(status)){
+            	Map<String, Object> result = new HashMap<>();
+				result.put("resultCode", "1");
+				result.put("resultMsg", "此账户被冻结,暂无法登陆");
+				return result;
+            }
+    		HttpSession session = request.getSession();
+    		session.setAttribute("sessionId", session.getId());
+    		session.setAttribute(Constant.LOGIN_USER_INFO, userInfo);
+    		request.getSession().removeAttribute(Constant.LOGIN_VAl_CODE);
+        }else{
+        	request.getSession().setAttribute(Constant.LOGIN_ERR_COUNT, errorCount+1);
+        	userInfo.put("errCount", errorCount+1);
+        }
+		return userInfo;
+	}
+	
+	/**
+	 * 获取字典信息
+	 * @param tagName
+	 * @return
+	 */
+	@RequestMapping(value = "/getDictionaryByCode.html")
+	@ResponseBody
+	public List<Map<String, Object>> getDictionaryByCode(@RequestParam Map<String, Object> reqMap ,HttpServletRequest request) {
+		String code = reqMap.get("code").toString();
+		return this.personalService.findDictionaryInfoByCode(code,"0");
+	}
+	
+	@RequestMapping(value = "/getSchoolInfo.html")
+	@ResponseBody
+	public List<Map<String, Object>> getSchoolInfo(@RequestParam Map<String, Object> reqMap ,HttpServletRequest request) {
+		String code = reqMap.get("code")==null?"":reqMap.get("code").toString().trim();
+		String city = reqMap.get("city")==null?"":reqMap.get("city").toString().trim();
+		return this.personalService.getSchoolInfos(code,city);
+	}
+	
+	/**
+	 * 用户注册
+	 * @param tagName
+	 * @return
+	 */
+	@RequestMapping(value = "/registry.html")
+	@ResponseBody
+	public Map<String, Object> registry(@RequestParam Map<String, Object> reqMap ,HttpServletRequest request) {
+		String userImg = reqMap.get("img").toString();
+		String checkCode = reqMap.get("checkCode").toString();
+		String sms_code = request.getSession().getAttribute(Constant.SMS_CODE).toString();
+		String ipAddr = Util.getIpAddr(request);
+		if(!sms_code.equals(checkCode)){
+			Map<String, Object> result =new HashMap<>();
+			result.put("resultCode", "1");
+			result.put("resultMsg", "短信验证码有误,请重新获取");
+			return result;
+		}
+		if(userImg.indexOf("base64")>0){
+			Map<String, String> map = FileOperateUtil.GenerateImage(userImg, request);
+			reqMap.put("img",map.get("url"));
+		}else{
+			reqMap.put("img",GlobalUtil.getValue("netfilepath")+"user.png");
+		}
+		Map<String, Object> result = this.personalService.saveUser(reqMap);
+		Map<String, Object>  userInfo  = personalService.checkLoginInfo(reqMap.get("username").toString(), reqMap.get("pwd").toString(),ipAddr);
+		if("0".equals(result.get("resultCode"))){
+    		HttpSession session = request.getSession();
+    		session.setAttribute("sessionId", session.getId());
+    		session.setAttribute(Constant.LOGIN_USER_INFO, userInfo);
+    		request.getSession().removeAttribute(Constant.LOGIN_VAl_CODE);
+		}
+		return result;
+	}
+	
+	/**
+	 * 用户注册
+	 * @param 获取手机验证码
+	 * @return
+	 * 1:用户注册
+	 * 2:忘记密码
+	 */
+	@RequestMapping(value = "/getTelCode.html")
+	@ResponseBody
+	public Map<String, Object> getTelCode(@RequestParam Map<String, Object> reqMap ,HttpServletRequest request) {
+		Map<String, Object> result = new HashMap<String, Object>();
+		String tel = reqMap.get("tel").toString();
+		String type = reqMap.get("type").toString();
+		boolean flag = this.personalService.isExistUserNameOrTel(tel);
+		Map<String , Object> paramsMap = new HashMap<>();
+		if("1".equals(type)){
+//			if(flag){
+//				result.put("resultCode", "1");
+//				result.put("resultMsg", "该手机号码已经注册！");
+//			}else{
+//				//短信发送
+				String code = Util.createRandom(true, 4);
+//				paramsMap.put("code", code);
+//				paramsMap.put("product", Constant.PRODUCT_NAME);
+//				try {
+//					boolean success = SmsUtil.sendSMS(Constant.ALIDAYU_SIGNNAME_REGISTER, new JSONObject(paramsMap).toString(), tel, Constant.ALIDAYU_TEMPALTE_REGISTER);
+//					if(!success){
+//						result.put("resultCode", "1");
+//						result.put("resultMsg", "短信验证码发送失败");
+//						return result;
+//					}
+//				} catch (ApiException e) {
+//					// TODO Auto-generated catch block
+//					e.printStackTrace();
+//					result.put("resultCode", "1");
+//					result.put("resultMsg", "短信验证码发送失败");
+//					return result;
+//				}
+				request.getSession().setAttribute(Constant.SMS_CODE, code);
+				System.out.println(code);
+				result.put("resultCode", "0");
+				result.put("resultMsg", "短信发送成功");
+//			}
+		}else if("2".equals(type)){
+			if(flag){
+				//短信发送
+				String code = Util.createRandom(true, 4);
+				paramsMap.put("code", code);
+				paramsMap.put("product", Constant.PRODUCT_NAME);
+				try {
+					boolean success = SmsUtil.sendSMS(Constant.ALIDAYU_SIGNNAME_PWDCHANGE, new JSONObject(paramsMap).toString(), tel, Constant.ALIDAYU_TEMPALTE_PWDCHANGE);
+					if(!success){
+						result.put("resultCode", "1");
+						result.put("resultMsg", "短信验证码发送失败");
+						return result;
+					}
+				}catch (ApiException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+					result.put("resultCode", "1");
+					result.put("resultMsg", "短信验证码发送失败");
+					return result;
+				}
+				request.getSession().setAttribute(Constant.SMS_CODE, code);
+				System.out.println(code);
+				result.put("resultCode", "0");
+				result.put("resultMsg", "短信发送成功");
+			}else{
+				result.put("resultCode", "1");
+				result.put("resultMsg", "该手机号码未注册！");
+			}
+		}
+		return result;
+	}
+	/**
+	 * 判断注册用户名是否已经存在
+	 * @param tagName
+	 * @return
+	 */
+	@RequestMapping(value = "/checkUserName.html")
+	@ResponseBody
+	public Map<String, Object> checkUserName(@RequestParam Map<String, Object> reqMap ,HttpServletRequest request) {
+		Map<String, Object> result = new HashMap<String, Object>();
+		String username = reqMap.get("username").toString();
+		boolean flag = this.personalService.isExistUserNameOrTel(username);
+		if(flag){
+			result.put("resultCode", "1");
+			result.put("resultMsg", "该用户名已经被注册！");
+		}else{
+			result.put("resultCode", "0");
+		}
+		return result;
+	}
+	
+	/**
+	 * 重置密码
+	 * @param tagName
+	 * @return
+	 */
+	@RequestMapping(value = "/reSetPwd.html")
+	@ResponseBody
+	public Map<String, Object> reSetPwd(@RequestParam Map<String, Object> reqMap ,HttpServletRequest request) {
+		Map<String, Object> result = new HashMap<String, Object>();
+		String tel = reqMap.get("tel").toString();
+		String code = reqMap.get("code").toString();
+		String newPwd = reqMap.get("newPwd").toString();
+		String smsCode = request.getSession().getAttribute(Constant.SMS_CODE)==null?"":request.getSession().getAttribute(Constant.SMS_CODE).toString();
+		if(code.equals(smsCode)){
+			request.getSession().removeAttribute(Constant.SMS_CODE);
+			int rows = this.personalService.updateUserPwd(tel, newPwd);
+			if(rows!=0){
+				result.put("resultCode", "0");
+				result.put("resultMsg", "密码重置成功");
+			}else{
+				result.put("resultCode", "1");
+				result.put("resultMsg", "密码重置失败,请联系管理员！");
+			}
+		}else{
+			result.put("resultCode", "1");
+			result.put("resultMsg", "短信验证码有误,请重新获取");
+		}
+		return result;
+	}
+	
+	/**
+	 * 获取验证码
+	 * @return
+	 * @throws IOException 
+	 */
+    @RequestMapping(value="/getValidateCode.html")
+    public void getValidateCode(HttpServletRequest reqeust,HttpServletResponse response) throws IOException{
+    	 // 设置响应的类型格式为图片格式  
+        response.setContentType("image/jpeg");  
+        //禁止图像缓存。  
+        response.setHeader("Pragma", "no-cache");  
+        response.setHeader("Cache-Control", "no-cache");  
+        response.setDateHeader("Expires", 0);  
+        HttpSession session = reqeust.getSession();  
+        ValidateCode vCode = new ValidateCode(112,47,4,100);  
+        session.setAttribute(Constant.LOGIN_VAl_CODE, vCode.getCode());  
+        vCode.write(response.getOutputStream());  
+    }
+    
+    /**
+     * 忘记密码
+     * @return
+     */
+    @RequestMapping(value="/forgetPassword.html")
+    public String forgetPassword(){
+    	
+        return "main/forgetPassword";
+    }
+    
+    /**
+     * 用户注册
+     * @return
+     */
+    @RequestMapping(value="/userRegistry.html")
+    public String userRegistry(){
+    	
+    	return "main/userRegistry";
+    }
+    
+    /**
+     * 注销
+     */
+    /**
+     * 用户注册
+     * @return
+     */
+    @RequestMapping(value="/cancel.html")
+    public String cancel(HttpServletRequest reqeust,HttpServletResponse response){
+    	reqeust.getSession().removeAttribute(Constant.LOGIN_USER_INFO);
+    	reqeust.getSession().removeAttribute("sessionId");
+    	return "main/login";
+    }
+    
+    @RequestMapping(value="/checkCurrentUserIsLogin.html")
+    @ResponseBody
+    public boolean checkCurrentUserIsLogin(HttpServletRequest reqeust,HttpServletResponse response){
+    	Map<String, Object> userInfo = (Map<String, Object>)reqeust.getSession().getAttribute(Constant.LOGIN_USER_INFO);
+    	if(userInfo!=null){
+    		return true;
+    	}
+    	return false;
+    }
+    @RequestMapping(value="/getAdvertisementList.html")
+    @ResponseBody
+    public List<Map<String,Object>> getAdvertisementList(HttpServletRequest reqeust,HttpServletResponse response){
+        return this.personalService.listAdvertisement();
+    }
+}

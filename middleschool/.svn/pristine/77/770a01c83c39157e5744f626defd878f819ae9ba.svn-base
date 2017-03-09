@@ -1,0 +1,50 @@
+### set log levels ###
+log4j.rootLogger = INFO,stdout,E
+
+## \u6b63\u5f0f\u73af\u5883\u9700\u5220\u9664 ###
+#log4j.logger.org.hibernate.SQL=DEBUG
+#log4j.logger.org.hibernate.type=DEBUG
+#log4j.logger.org.hibernate.tool.hbm2ddl=DEBUG
+#log4j.logger.org.hibernate.pretty=DEBUG
+#log4j.logger.org.hibernate.cache=DEBUG
+#log4j.logger.org.hibernate.transaction=DEBUG
+#log4j.logger.org.hibernate.jdbc=DEBUG
+#log4j.logger.org.hibernate.hql.ast.AST=DEBUG
+#log4j.logger.org.hibernate.secure=DEBUG
+#log4j.logger.org.hibernate=DEBUG
+#log4j.logger.java.sql=DEBUG
+#log4j.logger.java.sql.Connection=DEBUG
+#log4j.logger.java.sql.Statement=DEBUG
+#log4j.logger.java.sql.PreparedStatement=DEBUG
+#log4j.logger.java.sql.ResultSet=DEBUG
+#log4j.logger.org.springframework.security=DEBUG
+#log4j.logger.org.springframework.web.servlet=DEBUG
+#log4j.logger.org.springframework.web=DEBUG
+#log4j.logger.org.springframework.cache=DEBUG
+#log4j.logger.org.springframework=DEBUG
+#log4j.logger.cn.ffcs=INFO
+#
+# \u8f93\u51fa\u5230\u63a7\u5236\u53f0 ###
+log4j.appender.stdout = org.apache.log4j.ConsoleAppender
+log4j.appender.stdout.Target = System.out
+log4j.appender.stdout.layout = org.apache.log4j.PatternLayout
+log4j.appender.stdout.layout.ConversionPattern = %d{yyyy-MM-dd HH\:mm\:ss} (%r ms) [%t] %-5p\: %c\#%M %x\: %m%n
+
+## \u8f93\u51fa\u5230\u65e5\u5fd7\u6587\u4ef6 ###
+log4j.appender.D = org.apache.log4j.DailyRollingFileAppender
+log4j.appender.D.File = ${txb.root}/logs/all/all.log
+log4j.appender.D.datePattern='.'yyyy-MM-dd-a
+log4j.appender.D.Append = true
+log4j.appender.D.ImmediateFlush=true
+log4j.appender.D.layout = org.apache.log4j.PatternLayout
+log4j.appender.D.layout.ConversionPattern = %d{yyyy-MM-dd HH:mm:ss} [%c]-[%l]-[%p] %m%n
+
+### \u4fdd\u5b58\u5f02\u5e38\u4fe1\u606f\u5230\u5355\u72ec\u6587\u4ef6 ###
+#log4j.appender.E = org.apache.log4j.DailyRollingFileAppender
+#log4j.appender.E.File = ${txb.root}/logs/error/error.log 
+#log4j.appender.E.datePattern='.'yyyy-MM-dd-a
+#log4j.appender.E.Append = true
+#log4j.appender.E.ImmediateFlush=true
+#log4j.appender.E.Threshold = ERROR 
+#log4j.appender.E.layout = org.apache.log4j.PatternLayout
+#log4j.appender.E.layout.ConversionPattern = %d{yyyy-MM-dd HH:mm:ss} [%c]-[%l]-[%p] %m%n 

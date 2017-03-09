@@ -1,0 +1,55 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+	pageEncoding="UTF-8"%>
+<%@include file="/plugins/customer/jsp/appcommon.jsp"%>
+<!DOCTYPE>
+<html>
+<head>
+		<meta charset="utf-8">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge">
+		<meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0;" name="viewport" />
+		<title>思明E学</title>
+		<link href="<%=path%>resources/app/common/css/style.css" rel="stylesheet">
+</head>
+<body>
+<div class="title-box">
+	<span class="g-left-icon">
+		<img src="<%=path%>resources/app/common/imgs/back.png" onclick="Common.back(1,1);"/>
+	</span>
+	<h1 class="title">密码找回</h1>
+	<span class="g-right-icon"></span>
+</div>
+<div class="g-form-group-box">
+	<ul class="g-form-group">
+		<li class="form-list">
+				<label>手机号码：</label>
+				<input type="text" id="tel" />
+			</li>
+			<li class="form-list">
+				<label>验证码：</label>
+				<div class="g-input-btn-box">
+					<input type="text" id="code"/>
+					<button class="btn"  id="validateTime" onclick="appLogin.getValidateCode(2);">获取</button>
+				</div>
+			</li>
+			<li class="form-list">
+				<label>新密码：</label>
+				<input type="password" id = "newPwd" maxlength="18" min="6" onkeyup="value=value.replace(/[\W]/g,'')" onbeforepaste="clipboardData.setData('text',clipboardData.getData('text').replace(/[^\d]/g,''))"/>
+			</li>
+	</ul>
+</div>
+<div class="g-btn-bottom-box">
+	<button class="sure-btn" onclick="appLogin.reSetPwd();">提交</button>
+</div>
+<!--加载层组件-->
+<div id = "mask" class="g-loading-bg-box dis_none">
+	<div class="g-loading-box">
+		<div class="typing_loader"></div>
+		<p class="loading-text">努力加载中</p>
+	</div>
+</div>
+</body>
+	<script type="text/javascript" src="<%=path%>resources/app/common/js/width.js"></script>
+	<script type="text/javascript" src="<%=path%>resources/app/common/js/btn.js"></script>
+	<script type="text/javascript" src="<%=path%>resources/app/common/js/iosSelect.js"></script>
+	<script type="text/javascript" src="<%=path%>resources/app/common/js/iscroll.js"></script>
+</html>

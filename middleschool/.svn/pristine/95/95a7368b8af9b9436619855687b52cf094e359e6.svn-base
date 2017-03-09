@@ -1,0 +1,19 @@
+.leftDiv {
+	float: left;
+	width: 26%;
+	overflow: auto;
+}
+
+.rightDiv {
+	float: left;
+	margin-left: 2px;
+	width: 73%;
+}
+.treeDiv{
+	width:100%;
+	height:100%;
+	overflow: auto;
+}
+fieldset {
+	height: 92%;
+}

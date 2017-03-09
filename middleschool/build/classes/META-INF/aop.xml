@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE aspectj PUBLIC "-//AspectJ//DTD//EN" "aspectj.dtd" >
+<aspectj>
+	<!---->
+	<weaver options="-Xset:weaveJavaxPackages=true -verbose -showWeaveInfo -debug">
+		<include within="cn.ffcs..service..*"/>
+		<include within="cn.ffcs.srp.core.repository.impl.CoreDAOImpl"/>
+		<exclude within="*..*CGLIB*" />
+		<exclude within="*..*JAVAASSIST*" />
+		<include within="cn.ffcs.srp.core.repository.publicField.HandlePublicFieldInterceptor"/>
+	</weaver>
+	 
+	<aspects>
+		<aspect name="cn.ffcs.srp.core.repository.publicField.HandlePublicFieldInterceptor"/>
+	</aspects>
+	 
+</aspectj>

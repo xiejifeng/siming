@@ -1,0 +1,45 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+	pageEncoding="UTF-8"%>
+<%@include file="/plugins/customer/jsp/appcommon.jsp"%>
+<!DOCTYPE>
+<html>
+<head>
+		<meta charset="utf-8">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge">
+		<meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0;" name="viewport" />
+		<title>思明E学</title>
+		<link href="<%=path%>resources/app/common/css/style.css" rel="stylesheet">
+	</head>
+	<body>
+			<div class="g-login-box">
+				<div class="g-input-box">
+				<div class="g-logo-box">
+					<img src="<%=path%>resources/app/common/imgs/logo.png" />
+				</div>
+					<input type="text" placeholder="手机码号" class="submite-input" id="username"  onkeyup="value=value.replace(/[\W]/g,'')" onbeforepaste="clipboardData.setData('text',clipboardData.getData('text').replace(/[^\d]/g,''))"/>
+					<input type="password" placeholder="登录密码" class="submite-input password" id= "password"  onkeyup="value=value.replace(/[\W]/g,'')" onbeforepaste="clipboardData.setData('text',clipboardData.getData('text').replace(/[^\d]/g,''))"/>
+					<div class="g-yzm-box dis_none" id="code_div">
+						<input type="text" placeholder="请输入验证码" class="yzm-input" id="code"/>
+						<img id = "validateCode" src="<%=path%>appLogin/getValidateCode.html" class="yzm" onclick="appLogin.changeValidateCode();"/>
+					</div>
+					<a href="##" class="forget-password" onclick="appLogin.forgetPassword();">忘记密码</a>
+				<div class="g-submite-box">
+					<button class="submite-btn" onclick="appLogin.login();">登录</button>
+					<button class="submite-btn sub-2" onclick="appLogin.userRegistry();">新用户注册送1G流量</button>
+					<button class="submite-btn sub-3" onclick="Common.back(3,2);">继续上课</button>
+				</div>
+				</div>
+			</div>
+		<!--加载层组件-->
+		<div id = "mask" class="g-loading-bg-box dis_none">
+			<div class="g-loading-box">
+				<div class="typing_loader"></div>
+				<p class="loading-text">努力加载中</p>
+			</div>
+		</div>
+	</body>
+	<script type="text/javascript" src="<%=path%>resources/app/common/js/width.js"></script>
+	<script type="text/javascript" src="<%=path%>resources/app/common/js/btn.js"></script>
+	<script type="text/javascript" src="<%=path%>resources/app/common/js/iosSelect.js"></script>
+	<script type="text/javascript" src="<%=path%>resources/app/common/js/iscroll.js"></script>
+</html>

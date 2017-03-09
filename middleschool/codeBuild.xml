@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project basedir="." name="codeBuilder">
+	<property file="codeBuild.properties"></property>
+	
+	<property name="template.dir" value="src"></property>
+	<property name="src.dir" value="${src.dir}"></property>
+	<property name="ldm.dir" value="${ldm.dir}"></property>
+	<property name="pdm.dir" value="${pdm.dir}"></property>
+	<property name="jdbc.driverClassName" value="${jdbc.driverClassName}"></property>
+	<property name="jdbc.url" value="${jdbc.url}"></property>
+	<property name="jdbc.username" value="${jdbc.username}"></property>
+	<property name="jdbc.password" value="${jdbc.password}"></property>
+	<property name="table.prefix" value="${table.prefix}"></property>
+	<property name="table.name" value="${table.name}"></property>
+	
+	<path id="libs">
+		<fileset dir="WebContent/WEB-INF/lib" includes="*.jar"></fileset>
+		<filelist files="src/configure/log4j.properties"></filelist>
+	</path>
+	<target name="generate">
+		<java fork="true" classname="${classname}" failonerror="true">
+			<arg value="${file.dir}"/>
+			<arg value="${src.dir}"/>
+			<arg value="${table.prefix}"/>
+			<!--是否生成所有表的文件：Y/N-->
+			<arg value="${generate.all}"/>
+			<arg value="${table.name}"/>
+			<!--生成的文件种类：all/entity/dao/service/controller/sql/resource/validate/jsp/js-->
+			<arg value="${file.type}"/>
+			<classpath refid="libs"></classpath>
+			<classpath path="${classes.dir}"></classpath>
+		</java>
+	</target>
+	<!--
+	<target name="generate_ldm">
+		<antcall target="generate">
+			<param name="file.dir" value="${ldm.dir}"/>
+			<param name="classname" value="cn.ffcs.srp.tools.builder.ldm.LdmParse"/>
+		</antcall>
+	</target>
+	<target name="generate_from_ldm">
+		<antcall target="generate_ldm">
+			<param name="generate.all" value="N"/>
+			<param name="table.name" value="${table.name}"/>
+			<param name="file.type" value="all"/>
+		</antcall>
+	</target>
+	<target name="generate_web_from_ldm">
+		<antcall target="generate_ldm">
+			<param name="generate.all" value="N"/>
+			<param name="table.name" value="${table.name}"/>
+			<param name="file.type" value="jsp,js"/>
+			<param name="src.dir" value="${webroot.dir}"/>
+		</antcall>
+	</target>
+	<target name="generate_pdm">
+		<antcall target="generate">
+			<param name="file.dir" value="${pdm.dir}"/>
+			<param name="classname" value="cn.ffcs.srp.tools.builder.pdm.PdmParse"/>
+		</antcall>
+	</target>
+	<target name="generate_from_pdm">
+		<antcall target="generate_pdm">
+			<param name="generate.all" value="N"/>
+			<param name="table.name" value="${table.name}"/>
+			<param name="file.type" value="all"/>
+		</antcall>
+	</target>
+	<target name="generate_web_from_pdm">
+		<antcall target="generate_pdm">
+			<param name="generate.all" value="N"/>
+			<param name="table.name" value="${table.name}"/>
+			<param name="file.type" value="jsp,js"/>
+			<param name="src.dir" value="${webroot.dir}"/>
+		</antcall>
+	</target>
+	-->
+	<target name="generate_db">
+			<java fork="true" classname="cn.ffcs.srp.tools.builder.db.TableMetaData" failonerror="true" >
+				<arg value="${jdbc.driverClassName}"/>
+				<arg value="${jdbc.url}"/>
+				<arg value="${jdbc.username}"/>
+				<arg value="${jdbc.password}"/>
+				<arg value="${jdbc.databaseName}"/>
+				<arg value="${src.dir}"/>
+				<arg value="${table.prefix}"/>
+				<!--是否生成所有表的文件：%:生成所有表对象  sys_%:生成以sys_开头的表对象   sys_user:生成sys_user表对象-->
+				<arg value="${table.name}"/>
+				<!--生成的文件种类：all/entity/dao/service/controller/sql/resource/validate/jsp/js-->
+				<arg value="${file.type}"/>
+				<classpath refid="libs"></classpath>
+				<classpath path="${classes.dir}"></classpath>
+			</java>
+	</target>
+	<target name="generate_from_db">
+		<antcall target="generate_db">
+			<param name="table.name" value="${table.name}"/>
+			<param name="file.type" value="entity,dao"/>
+		</antcall>
+	</target>
+	<target name="generate_web_from_db">
+		<antcall target="generate_db">
+			<param name="table.name" value="${table.name}"/>
+			<param name="file.type" value="jsp,js"/>
+			<param name="src.dir" value="${webroot.dir}"/>
+		</antcall>
+	</target>
+</project>

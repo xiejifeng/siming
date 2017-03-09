@@ -1,0 +1,185 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  - Application context containing authentication, channel
+  - security and web URI beans.
+  -
+  - Only used by "filter" artifact.
+  -
+  -->
+
+<b:beans xmlns="http://www.springframework.org/schema/security"
+    xmlns:b="http://www.springframework.org/schema/beans"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.2.xsd
+                        http://www.springframework.org/schema/security http://www.springframework.org/schema/security/spring-security-3.1.xsd">
+<!--
+    <global-method-security pre-post-annotations="enabled">
+        <expression-handler ref="expressionHandler"/>
+    </global-method-security>
+-->
+	<http pattern="/plugins/**" security="none"/>
+	<http pattern="/resources/**" security="none"/>
+	<http pattern="/message/**" security="none"/>
+	<http pattern="/fields/**" security="none"/>
+	<http pattern="/api/**" security="none"/>
+	<http pattern="/editor/**" security="none"/>
+	<http pattern="/explorer/**" security="none"/>
+	<http pattern="/libs/**" security="none"/>
+	<http pattern="/jasper/images/**" security="none"/>
+	<http pattern="/main/doCheckCode.srp*" security="none"/>
+	<http pattern="/main/login.srp*" security="none"/>
+	<http pattern="/*.txt*" security="none"/>
+	<http pattern="/*.htm*" security="none"/>
+	<http pattern="/*/*.html*" security="none"/>
+	<http pattern="/*/*.htm*" security="none"/>
+	<http pattern="/WEB-INF/jsp/app/main/403.jsp" security="none"/>
+	<http pattern="/WEB-INF/jsp/app/main/jsonstring.jsp" security="none"/>
+    <http use-expressions="true" entry-point-ref="srpLoginUrlAuthenticationEntryPoint">
+    	<!--
+    	<intercept-url pattern="/jsp/app/main/login.jsp*" access="ROLE_SUPERVISOR"/>
+    	
+        <form-login login-page="/jsp/app/main/login.jsp" default-target-url="/jsp/app/main/loginSuccess.jsp" login-processing-url="/sys/login/doLogin.action" authentication-failure-url="/jsp/app/main/login.jsp?login_error=1"/>
+        -->
+        <http-basic/>
+        <logout logout-success-url="/main/login.srp" logout-url="/j_spring_security_logout"/>
+        <!--
+        <remember-me />
+        
+        <session-management invalid-session-url="/jsp/main/login.jsp" session-authentication-error-url="/jsp/app/main/login.jsp">
+            <concurrency-control max-sessions="1" error-if-maximum-exceeded="true" />
+        </session-management>
+        -->
+        <anonymous enabled="false"/>
+        <access-denied-handler ref="srpAccessDeniedHandler"/>
+        <!-- 避免ajax 被cache -->
+        <request-cache ref="httpSessionRequestCache"/>
+        
+        <!--session管理-->
+        <custom-filter ref="concurrencyFilter"  before="SECURITY_CONTEXT_FILTER" />
+        <!-- 登录过滤器 -->
+        <custom-filter ref="loginFilter" position="FORM_LOGIN_FILTER"  />
+        <!-- 认证过滤器 -->
+        <custom-filter ref="filterSecurityInterceptor" before="FILTER_SECURITY_INTERCEPTOR"/>
+        
+        <session-management session-authentication-strategy-ref="sas"/>
+    </http>
+    <!--无访问权限处理-->
+    <b:bean id="srpAccessDeniedHandler" class="cn.ffcs.srp.app.security.SrpAccessDeniedHandlerImpl">
+    	<b:property name="errorPage" value="/WEB-INF/jsp/app/main/403.jsp"></b:property>
+    </b:bean>
+    <!--save request处理-->
+    <b:bean id="httpSessionRequestCache" class="org.springframework.security.web.savedrequest.HttpSessionRequestCache">
+    	<b:property name="requestMatcher" ref="srpRequestMatcher"/>
+    </b:bean>
+    <b:bean id="srpRequestMatcher" class="cn.ffcs.srp.app.security.SrpRequestMatcher"></b:bean>
+    <!-- 登录验证器 -->
+    <b:bean id="loginFilter" class="cn.ffcs.srp.app.security.SrpUsernamePasswordAuthenticationFilter">
+		<!-- 处理登录 -->
+		<b:property name="filterProcessesUrl" value="/j_spring_security_check"></b:property>
+		<b:property name="authenticationSuccessHandler" ref="loginLogAuthenticationSuccessHandler"></b:property>
+		<b:property name="authenticationFailureHandler" ref="simpleUrlAuthenticationFailureHandler"></b:property>
+		<b:property name="authenticationManager" ref="srpAuthenticationManager"></b:property>
+		<!--限制用户并发数-->
+		<b:property name="sessionAuthenticationStrategy" ref="sas"></b:property>
+	</b:bean>
+	<b:bean id="loginLogAuthenticationSuccessHandler" class="cn.ffcs.srp.app.security.SrpAuthenticationSuccessHandler">
+		<b:property name="defaultTargetUrl" value="/WEB-INF/jsp/app/main/jsonString.jsp"></b:property>
+		<b:property name="successHandler">
+			<b:bean class="cn.ffcs.srp.app.security.handler.support.DefaultLoginSuccessHandler">
+				<b:property name="handlers">
+					<b:list>
+						<b:bean class="cn.ffcs.srp.app.online.OnlineUserHandler"></b:bean>
+					</b:list>
+				</b:property>
+			</b:bean>
+		</b:property>
+	</b:bean>
+	<b:bean id="simpleUrlAuthenticationFailureHandler" class="cn.ffcs.srp.app.security.SrpAuthenticationFailureHandler">
+		<b:property name="defaultFailureUrl" value="/main/login.srp"></b:property>
+	</b:bean>
+    <b:bean id="srpLoginUrlAuthenticationEntryPoint" class="cn.ffcs.srp.app.security.SrpLoginUrlAuthenticationEntryPoint">
+    	<b:property name="loginFormUrl" value="/main/login.srp"></b:property>
+    </b:bean>
+    
+    <!-- 认证过滤器 -->
+    <b:bean id="filterSecurityInterceptor" class="org.springframework.security.web.access.intercept.FilterSecurityInterceptor">
+    	<!-- 用户拥有的权限 -->
+    	<b:property name="authenticationManager" ref="srpAuthenticationManager" />
+    	<!-- 用户是否拥有所请求资源的权限 -->
+    	<b:property name="accessDecisionManager" ref="accessDecisionManager" />
+    	<!-- 资源与权限对应关系 -->
+    	<b:property name="securityMetadataSource" ref="srpInvocationSecurityMetadataSourceService" />
+    	<b:property name="observeOncePerRequest" value="false"/>
+    </b:bean>
+    <authentication-manager alias="srpAuthenticationManager">
+        <authentication-provider ref="daoAuthenticationProvider">
+        <!-- 
+           <password-encoder ref="passwordEncoder">
+           		<salt-source user-property="username"/>
+           </password-encoder>
+         -->
+        </authentication-provider>
+    </authentication-manager>
+    <b:bean id="daoAuthenticationProvider" class="org.springframework.security.authentication.dao.DaoAuthenticationProvider">
+    	<b:property name="hideUserNotFoundExceptions" value="false"></b:property>
+    	<b:property name="userDetailsService" ref="srpUserDetailsService"></b:property>
+    	<b:property name="passwordEncoder" ref="passwordEncoder"></b:property>
+    	<b:property name="saltSource">
+    		<b:bean class="org.springframework.security.authentication.dao.ReflectionSaltSource">
+    			<b:property name="userPropertyToUse" value="username"></b:property>
+    		</b:bean>
+    	</b:property>
+    </b:bean>
+    <!-- 用户的密码加密或解密 -->
+ 	<b:bean id="passwordEncoder" class="org.springframework.security.authentication.encoding.Md5PasswordEncoder">
+ 		<b:property name="encodeHashAsBase64" value="true"></b:property>
+    </b:bean>
+    <!--用户拥有的权限-->
+    <b:bean id="srpUserDetailsService" class="cn.ffcs.srp.app.security.SrpUserDetailsService"/>
+    <!--用户是否拥有所请求资源的权限-->
+    <!--
+    <b:bean id="srpAccessDecisionManager" class="com.ffcs.srp.security.SrpAccessDecisionManager"></b:bean>
+    -->
+    <b:bean id="accessDecisionManager" class="org.springframework.security.access.vote.AffirmativeBased">
+	 	<!-- 没有显式定义的资源都保护起来。该属性默认值为false -->
+	 	<b:property name="allowIfAllAbstainDecisions" value="false"/>
+        <b:property name="decisionVoters">
+            <b:list>
+                <b:bean class="org.springframework.security.access.vote.RoleVoter">
+                    <b:property name="rolePrefix" value="ROLE_" />
+                </b:bean>
+                <b:bean class="org.springframework.security.access.vote.AuthenticatedVoter" />
+            </b:list>
+        </b:property>
+    </b:bean>
+    <!-- 资源与权限对应关系 -->
+    <b:bean id="srpInvocationSecurityMetadataSourceService" class="cn.ffcs.srp.app.security.SrpInvocationSecurityMetadataSourceService">
+    	<b:property name="resourcesOfAuthentication">
+    		<b:ref local="resourcesOfAuthentication"/>
+    	</b:property>
+    </b:bean>
+    <b:bean id="resourcesOfAuthentication" class="cn.ffcs.srp.app.security.ResourcesOfAuthentication">
+    	<b:property name="roleService" ref="roleService"></b:property>
+    </b:bean>
+    
+    <b:bean id="concurrencyFilter" class="cn.ffcs.srp.app.security.SrpConcurrentSessionFilter">
+    	<b:constructor-arg ref="sessionRegistry" />
+    	<b:constructor-arg value="/resources/busi/common/toLogin.jsp" />
+    	<!-- 是否要求登录 -->
+    	<b:property name="requiredSession" value="true"/>
+    	<b:property name="excludeUrls">
+	    	<b:list>
+	    		<b:value>/j_spring_security_check</b:value>
+	    	</b:list>
+	    </b:property>
+	</b:bean>
+	<b:bean id="sas" class="org.springframework.security.web.authentication.session.ConcurrentSessionControlStrategy">
+	    <b:constructor-arg ref="sessionRegistry" />
+	    <b:property name="maximumSessions" value="5" />
+	    <b:property name="exceptionIfMaximumExceeded" value="true"/>
+	</b:bean>
+	<b:bean id="sessionRegistry" class="org.springframework.security.core.session.SessionRegistryImpl" />
+
+    <!-- Automatically receives AuthenticationEvent messages -->
+    <b:bean id="loggerListener" class="org.springframework.security.authentication.event.LoggerListener"/>
+</b:beans>

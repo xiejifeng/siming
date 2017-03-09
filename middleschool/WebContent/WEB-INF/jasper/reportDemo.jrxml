@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="reportDemo" language="groovy" pageWidth="595" pageHeight="842" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="e87bb256-e7ec-4647-922d-4224bfcb9bb5">
+	<property name="ireport.zoom" value="1.0"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<style name="sylCN" hAlign="Center" vAlign="Middle" fontName="SansSerif" fontSize="12" isBold="false" isItalic="false" isUnderline="false" pdfFontName="STSong-Light" pdfEncoding="UniGB-UCS2-H"/>
+	<field name="seqNo" class="java.lang.String"/>
+	<field name="name" class="java.lang.String"/>
+	<field name="address" class="java.lang.String"/>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="79" splitType="Stretch">
+			<staticText>
+				<reportElement uuid="7060e0e1-b825-4534-bb74-99246c3c289c" style="sylCN" x="104" y="15" width="368" height="43"/>
+				<textElement>
+					<font size="18" isBold="true" isItalic="false"/>
+				</textElement>
+				<text><![CDATA[测试报表]]></text>
+			</staticText>
+		</band>
+	</title>
+	<pageHeader>
+		<band splitType="Stretch"/>
+	</pageHeader>
+	<columnHeader>
+		<band height="39" splitType="Stretch">
+			<staticText>
+				<reportElement uuid="c4ce99ca-14bb-4d29-b880-89299ac3039a" style="sylCN" x="15" y="11" width="71" height="25"/>
+				<textElement>
+					<font size="14" isBold="true"/>
+				</textElement>
+				<text><![CDATA[序号]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="3162edd7-6067-447b-b42c-957f365d975c" style="sylCN" x="177" y="11" width="132" height="25"/>
+				<textElement>
+					<font size="14" isBold="true"/>
+				</textElement>
+				<text><![CDATA[姓名]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="46732dcd-ab95-4c14-a2a0-842443d67639" style="sylCN" x="383" y="11" width="156" height="25"/>
+				<textElement>
+					<font size="14" isBold="true"/>
+				</textElement>
+				<text><![CDATA[地址]]></text>
+			</staticText>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="42" splitType="Stretch">
+			<textField>
+				<reportElement uuid="5580b8ac-2025-4049-87a6-025d6317f5eb" style="sylCN" x="15" y="12" width="71" height="20"/>
+				<textElement/>
+				<textFieldExpression><![CDATA[$F{seqNo}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement uuid="554939e3-22b9-4f89-a3bf-4bfbb44ca36d" style="sylCN" x="177" y="12" width="132" height="20"/>
+				<textElement/>
+				<textFieldExpression><![CDATA[$F{name}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement uuid="4dbea519-84a1-41b4-9c54-9947bfda74b5" style="sylCN" x="383" y="12" width="156" height="20"/>
+				<textElement/>
+				<textFieldExpression><![CDATA[$F{address}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+	<columnFooter>
+		<band height="1" splitType="Stretch"/>
+	</columnFooter>
+	<pageFooter>
+		<band splitType="Stretch"/>
+	</pageFooter>
+	<summary>
+		<band splitType="Stretch"/>
+	</summary>
+</jasperReport>

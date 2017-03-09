@@ -1,0 +1,58 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+	pageEncoding="UTF-8"%>
+<%@include file="/plugins/customer/jsp/appcommon.jsp"%>
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0;" name="viewport" />
+	<title>思明E学</title>
+	<link rel="stylesheet" type="text/css" href="<%=path%>resources/app/common/appcss/common.css">
+	<link rel="stylesheet" href="<%=path%>resources/app/common/appcss/comPro.css">
+	<script type="text/javascript" src="<%=path%>resources/app/busi-js/personal/scoreExchange.js"></script>
+</head>
+<body>
+<header class="wrapper">
+	<h2>积分兑换</h2>
+	<a href="<%=path%>appScore/getProducts.html" class="back"><img src="<%=path%>resources/app/common/images/back.png" class="back_btn" /></a>
+	<a href="index.html" class="home"></a>
+</header>
+<c:if test="${!empty succeed}">
+<section class="go-on wrapper">
+	<div class="correct">
+		<img src="<%=path%>resources/app/common/images/pra-correct.png">
+	</div>
+	<h3>积分兑换成功！</h3>
+</section>
+<footer class="btn-wrap wrapper">
+	<a href="<%=path%>appScore/getProducts.html" class="btn-pro in-block">继续兑换</a>
+</footer>
+</c:if>
+
+<c:if test="${empty succeed}">
+<section class="go-on wrapper">
+	<div class="correct">
+		<img src="<%=path%>resources/app/common/images/pra-error.png">
+	</div>
+	<h3>积分兑换失败！
+	<c:if test="${!empty failed}">
+	<c:if test="${failed eq 1}">积分不够或物品库存不足！</c:if>
+	<c:if test="${failed eq -1}">请填写收货信息！</c:if>
+	</c:if>
+	</h3>
+</section>
+<footer class="btn-wrap wrapper">
+	<a href="<%=path%>appScore/getProducts.html" class="btn-pro in-block">再次兑换</a>
+</footer>
+</c:if>
+<script>
+changeWidth();
+function changeWidth(){
+	var rem=32/320*document.documentElement.clientWidth;
+	document.documentElement.style.fontSize=rem+'px';
+}
+window.addEventListener('resize',changeWidth,false);
+</script>
+</body>
+</html>

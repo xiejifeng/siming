@@ -1,0 +1,86 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+	pageEncoding="UTF-8"%>
+<%@include file="/plugins/customer/jsp/appcommon.jsp"%>
+<!DOCTYPE>
+<html>
+<head>
+		<meta charset="utf-8">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge">
+		<meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0;" name="viewport" />
+		<title>思明E学</title>
+		<link rel="stylesheet" type="text/css" href="<%=path%>resources/app/common/appcss/common.css">
+        <link rel="stylesheet" href="<%=path%>resources/app/common/appcss/comPro.css">
+	</head>
+<body class="bg-gray">
+<header class="wrapper">
+	<h2>个人中心</h2>
+	<a onclick="Common.back(2,2);" class="back"><img src="<%=path%>resources/app/common/images/back.png" class="back_btn" /></a>
+</header>
+<section class="wrapper user-call">
+	<div class="wrap clearFix">
+		<div class="user-dp fl"><img id ="pre_user_img" src="${LOGIN_USER_INFO.img}" style="width:55px;height:55px;" onclick="user_img.click();"/></div>
+		<div class="user-info">
+			<p>${LOGIN_USER_INFO.name}</p>
+			<span> ${LOGIN_USER_INFO.score}</span>
+		</div>
+	</div>
+</section>
+<nav class="wrap nav-user">
+	<ul class="clearFix">
+		<li class="fl lt">
+			<a onclick="Personal.studentInfo();">
+				<div>
+					<img src="<%=path%>resources/app/common/images/perIcon3.png">
+				</div>
+				<p>个人信息</p>
+			</a>
+		</li>
+		<li class="fl lr">
+			<a onclick="Personal.scoreExchange();">
+				<div>
+					<img src="<%=path%>resources/app/common/images/perIcon4.png">
+				</div>
+				<p>积分兑换</p>
+			</a>
+		</li>
+		<li class="fl lb">
+			<a  onclick="Personal.feedback();">
+				<div>
+					<img src="<%=path%>resources/app/common/images/perIcon5.png">
+				</div>
+				<p>意见反馈</p>
+			</a>
+		</li>
+		<li class="fl rb">
+			<a onclick="Personal.train();">
+				<div>
+					<img src="<%=path%>resources/app/common/images/perIcon1.png">
+				</div>
+				<p>版本信息</p>
+			</a>
+		</li>
+		<li class="fl c">
+			<a onclick="Personal.brushErrorExercises();">
+				<div>
+					<img src="<%=path%>resources/app/common/images/perIcon2.png">
+				</div>
+				<p>答题记录</p>
+			</a>
+		</li>
+	</ul>
+</nav>
+<form action="#" method="post">
+	<div class="btn-wrap wrapper bg-gray"  onclick="Personal.signOut();">
+		<input type="button" name="sub" value="退出登录" class="btn-pro bg-red">
+	</div>
+</form>
+<script>
+changeWidth();
+function changeWidth(){
+	var rem=32/320*document.documentElement.clientWidth;
+	document.documentElement.style.fontSize=rem+'px';
+}
+window.addEventListener('resize',changeWidth,false);
+</script>
+	</body>
+</html>

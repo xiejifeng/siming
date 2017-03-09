@@ -1,0 +1,133 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+	pageEncoding="UTF-8"%>
+<%@include file="/plugins/customer/jsp/appcommon.jsp"%>
+<!DOCTYPE>
+<html>
+<head>
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0;" name="viewport" />
+	<title>用户注册</title>
+	<link rel="stylesheet" type="text/css" href="<%=path%>resources/app/common/appcss/common.css">
+	<link rel="stylesheet" href="<%=path%>resources/app/common/appcss/formPro.css"></head>
+<body>
+<div class="tab1-box">
+	<header class="wrapper">
+		<h2>用户注册</h2>
+		<a onclick="Common.back(1,1);" class="back"><img src="<%=path%>resources/app/common/images/back.png" class="back_btn" /></a>
+	</header>
+	<section class="logo-icon wrapper">
+		<img src="<%=path%>resources/app/common/images/logo.jpg">
+	</section>
+	<section class="user-reg">
+		<form action="#" method="post">
+			<div class="form-group">
+				<label class="fl" for="phone">手机号码：</label>
+				<input type="text" name="phone" id="phone" class="fl txt">
+			</div>
+			<div class="form-group">
+				<label class="fl" for="phone">验证码：</label>
+				<input type="text" name="phone" class="fl txt code-text">
+				<input type="button" name="code" value="验证码" class="code">
+			</div>
+			<div class="form-group">
+				<label class="fl" for="phone">密码设置：</label>
+				<input type="text" name="phone" class="fl txt">
+			</div>
+			<div class="form-group">
+				<textarea id="address"></textarea>
+				<p class="agree">同意该服务条款</p>
+			</div>
+			<div class="btn-wrap wrapper"  onclick="appLogin.userRegistryValidateTel();">
+				<input type="button" name="sub" value="下一步" class="btn-pro">
+			</div>
+		</form>
+	</section>
+</div>
+<div class="tab2-box" style="display: none;">
+<header class="wrapper">
+	<h2>用户注册</h2>
+	<a class="back"><img src="<%=path%>resources/app/common/images/back.png" class="back_btn" /></a>
+</header>
+	<section class="user-reg">
+		<form action="#" method="post">
+			<div class="form-group">
+				<label class="fl" for="realname">真实姓名：</label>
+				<input type="text" name="realname" id="realname" class="fl">
+				<span>必填</span>
+			</div>
+			<div class="form-group">
+				<select name="city">
+					<option selected>选择性别</option>
+					<option value="上海">男</option>
+					<option>女</option>
+				</select>
+			</div>
+			<div class="form-group">
+				<select name="city">
+					<option selected>所在城市</option>
+					<option value="上海">上海</option>
+					<option>北京</option>
+					<option>深圳</option>
+				</select>
+			</div>
+			<div class="form-group">
+				<select name="school">
+					<option selected>所在学校</option>
+					<option>清华</option>
+					<option>北大</option>
+					<option>复旦</option>
+				</select>
+			</div>
+			<div class="form-group">
+				<select name="grade">
+					<option selected>就学年级</option>
+					<option>一年级</option>
+					<option>二年级</option>
+					<option>三年级</option>
+				</select>
+			</div>
+			<div class="form-group">
+				<label class="fl" for="address">收货地址：</label>
+				<textarea id="address"></textarea>
+				<span>选填</span>
+			</div>
+			<div class="btn-wrap wrapper" onclick="appLogin.userRegistryPwdSet();">
+				<input type="button" name="sub" value="提交" class="btn-pro">
+			</div>
+		</form>
+	</section>
+</div>
+<div class="tab3-box" style="display: none;">
+<header class="wrapper">
+	<h2>用户注册</h2>
+	<a href="javascript:;" class="back"><img src="<%=path%>resources/app/common/images/back.png" class="back_btn" /></a>
+</header>
+<section class="user-reg">
+	<form action="#" method="post">
+		<div class="dp">
+			<a href="javascript:;" style="height: auto;">
+				<img src="<%=path%>resources/app/common/images/girl.png" style="width: 88px;height: 87px;">
+				<p>编辑头像</p>
+			</a>
+		</div>
+		<div class="form-group">
+			<label class="fl" for="usercall">用户名称：</label>
+			<input type="text" name="username" id="usercall" class="fl txt">
+		</div>
+		<div class="btn-wrap wrapper" onclick="appLogin.userRegistryInfo();">
+			<input type="button" name="sub" value="提交" class="btn-pro">
+		</div>
+	</form>
+</section>
+</div>
+<script>
+changeWidth();
+function changeWidth(){
+	var rem=32/320*document.documentElement.clientWidth;
+	document.documentElement.style.fontSize=rem+'px';
+}
+window.addEventListener('resize',changeWidth,false);
+</script>
+</body>
+</html>

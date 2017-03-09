@@ -1,0 +1,42 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="cn.ffcs.srp.app.role.entity">
+	<sql-query name="cn.ffcs.srp.app.role.queryResourceItemOfAllRole">
+		<![CDATA[
+			SELECT tt.authority,t.resource_desc as "resourceDesc",t.is_public as "isPublic" FROM 
+				(SELECT re.id,rl.resource_desc,re.is_public from sys_resource re,sys_resource_item rl WHERE  re.id=rl.resource_id AND re.enabled=1)t 
+			LEFT JOIN 
+				(SELECT r.authority,rr.resource_id FROM sys_role r,sys_role_resource rr WHERE r.id=rr.role_id)tt 
+			ON t.id=tt.resource_id
+		]]>
+	</sql-query>
+	<query name="cn.ffcs.srp.app.role.findAll">
+		<![CDATA[
+			from Role role
+		]]>
+	</query>
+	<sql-query name="cn.ffcs.srp.app.role.findPaginationRoles">
+		<![CDATA[
+			SELECT r.id,r.name,r.authority,r.remark FROM sys_role r WHERE 1=1
+				 /**<#if (name??) && (name?trim != "")>**/ 
+					AND r.name LIKE :name 
+				/**</#if>**/
+				/**<#if (authority??) && (authority?trim != "")>**/
+					AND r.authority LIKE :authority
+				/**</#if>**/
+		]]>
+	</sql-query>
+	<sql-query name="cn.ffcs.srp.app.role.totalByAuthority">
+		<![CDATA[
+			SELECT COUNT(r.id) AS total FROM sys_role r WHERE r.authority=?
+		]]>
+	</sql-query>
+	<sql-query name="cn.ffcs.srp.app.role.findRourcesOfRole">
+		<![CDATA[
+			SELECT r.id as "resourceId",r.name as "resourceName",r.parent as "resParent",r.icon_cls as "iconCls",rr.role_id as "roleId",r.priority FROM sys_resource r 
+				LEFT JOIN sys_role_resource rr ON r.id=rr.resource_id AND rr.role_id=?
+ 				WHERE r.is_public=0  ORDER BY r.parent,r.priority,r.id
+		]]>
+	</sql-query>
+</hibernate-mapping>

@@ -1,0 +1,140 @@
+/**
+ * 刷题
+ */
+CommonUtils.regNamespace("Rong");
+Rong = (function() {
+	
+	/**
+	 * 初始化融聊天室
+	 */
+	var _initRongYun = function(){
+		//判断是否登录未登录2分钟后弹出登录按钮
+		var flag = Common.checkCurrentUserIsLogin();
+		if(!flag){
+			setInterval(function(){
+				if($("#div_pop").hasClass("dis-none")){
+					$("#div_pop").removeClass("dis-none");
+					$("#msg").html("还没登录哦,赶紧去登录吧！");
+				}
+				return;
+			 }, 1000*120); //一秒执行一次
+		
+		}
+		// _initMessageList();
+		 var token = $("#token").val(); 
+		 RongIMClient.connect(token,
+		         {
+		              onSuccess: function(userId) {
+		             // console.log("Login successfully." + userId);
+		        },
+		        onTokenIncorrect: function() {
+		         // console.log('token无效');
+		        },
+		        onError:function(errorCode){
+		              var info = '';
+		              switch (errorCode) {
+		                case RongIMLib.ErrorCode.TIMEOUT:
+		                  info = '超时';
+		                  break;
+		                case RongIMLib.ErrorCode.UNKNOWN_ERROR:
+		                  info = '未知错误';
+		                  break;
+		                case RongIMLib.ErrorCode.UNACCEPTABLE_PaROTOCOL_VERSION:
+		                  info = '不可接受的协议版本';
+		                  break;
+		                case RongIMLib.ErrorCode.IDENTIFIER_REJECTED:
+		                  info = 'appkey不正确';
+		                  break;
+		                case RongIMLib.ErrorCode.SERVER_UNAVAILABLE:
+		                  info = '服务器不可用';
+		                  break;
+		              }
+		            //  console.log(errorCode);
+		            }
+		      });
+	};
+	
+	var _sendMessage = function(){
+		var flag = Common.checkCurrentUserIsLogin();
+		if(!flag){
+//            $("#msg").html("您当前还未登陆,无法聊天");
+			if($("#div_pop").hasClass("dis-none")){
+		        	$("#div_pop").removeClass("dis-none");
+		      }
+			return;
+		}
+		// 定义消息类型,文字消息使用 RongIMLib.TextMessage
+		 //var msg = new RongIMLib.TextMessage({content:"hello",extra:"附加信息"});
+		 //或者使用RongIMLib.TextMessage.obtain 方法.具体使用请参见文档
+		 var sedMessage = $("#message").val();
+		 if(!sedMessage){
+			return;
+		 }
+		 var msg = RongIMLib.TextMessage.obtain(sedMessage+"@#$%^&*!*******&&^^%%$$#"+$("#imgurl").val()+"@#$%^&*!*******&&^^%%$$#"+$("#user_id").val());
+		 var conversationtype = RongIMLib.ConversationType.CHATROOM; // 私聊
+		 var targetId = $("#targetId").val(); // 目标 Id
+		 RongIMClient.getInstance().sendMessage(conversationtype, targetId, msg, {
+		                // 发送消息成功
+		                onSuccess: function (message) {
+		                    //message 为发送的消息对象并且包含服务器返回的消息唯一Id和发送消息时间戳
+		                	var html ='<li class="chat-list right"><div class="chat"><div class="chat-user-box"><span class="user-id">'+$("#user_id").val()+'</span><img src="'+$("#imgurl").val()+'" /><span class="caret"></span></div><span class="chat-info">'+sedMessage+'</span></div></li>';
+					        $("#messageList").append(html);
+					        $("#message").val("");
+		                },
+		                onError: function (errorCode,message) {
+		                    var info = '';
+		                    switch (errorCode) {
+		                        case RongIMLib.ErrorCode.TIMEOUT:
+		                            info = '超时';
+		                            break;
+		                        case RongIMLib.ErrorCode.UNKNOWN_ERROR:
+		                            info = '未知错误';
+		                            break;
+		                        case RongIMLib.ErrorCode.REJECTED_BY_BLACKLIST:
+		                            info = '在黑名单中，无法向对方发送消息';
+		                            break;
+		                        case RongIMLib.ErrorCode.NOT_IN_DISCUSSION:
+		                            info = '不在讨论组中';
+		                            break;
+		                        case RongIMLib.ErrorCode.NOT_IN_GROUP:
+		                            info = '不在群组中';
+		                            break;
+		                        case RongIMLib.ErrorCode.NOT_IN_CHATROOM:
+		                            info = '不在聊天室中';
+		                            break;
+		                        default :
+		                            info = x;
+		                            break;
+		                    }
+		                    console.log('发送失败:' + info);
+		                }
+		            }
+		        );
+	};
+	
+	//获取历史记录
+	var _getHistoryMsg = function(){
+		var targetId = $("#targetId").val();
+		//getHistoryMessages
+		 RongIMClient.getInstance().getHistoryMessages(RongIMLib.ConversationType.CHATROOM, targetId, null, 20, {
+		          onSuccess: function(list, hasMsg) {
+		            // hasMsg为boolean值，如果为true则表示还有剩余历史消息可拉取，为false的话表示没有剩余历史消息可供拉取。
+		               // list 为拉取到的历史消息列表
+//		        	  console.info(list);
+//		        	  console.info(hasMsg);
+		          },
+		          onError: function(error) {
+		              // APP未开启消息漫游或处理异常
+		                   // throw new ERROR ......
+		          }
+		        });
+	};
+	
+
+	return {
+		initRongYun   : _initRongYun,
+		sendMessage   : _sendMessage,
+		getHistoryMsg   : _getHistoryMsg
+	};
+	
+})();

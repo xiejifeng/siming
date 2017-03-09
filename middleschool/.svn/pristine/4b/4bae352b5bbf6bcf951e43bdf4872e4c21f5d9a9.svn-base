@@ -1,0 +1,74 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="cn.ffcs.srp.app.resource.entity">
+	<!--
+	<resultset name="returnResourceDTO">
+		<return alias="resource" class="cn.ffcs.srp.app.resource.dto.ResourceDTO">
+			<return-property name="id" column="id"></return-property>
+			<return-property name="name" column="name"></return-property>
+			<return-property name="resourceKey" column="resource_key"></return-property>
+			<return-property name="iconCls" column="icon_cls"></return-property>
+			<return-property name="resourceDesc" column="resource_desc"></return-property>
+		</return>
+		<return-scalar column="id" type="long"/>
+	</resultset>
+	-->
+	<sql-query name="cn.ffcs.srp.app.resource.findMainResourceByUser">
+		<![CDATA[
+			SELECT DISTINCT res.id,res.resource_key as "resourceKey",res.name,res.icon_cls as "iconCls",'' as "resourceDesc",0 as "ownership",res.parent,res.priority FROM
+				(SELECT r.* FROM sys_resource r,sys_role_resource rs
+					WHERE r.id=rs.resource_id AND r.view_type='0001' AND r.enabled=1 AND r.is_public=0 AND r.parent=0 AND
+					EXISTS(SELECT ur.* FROM sys_user_role ur WHERE ur.role_id=rs.role_id AND ur.user_id=?) 
+				 UNION ALL 
+					SELECT r.* FROM sys_resource r WHERE r.view_type='0001' AND r.enabled=1 AND r.is_public=1 AND r.parent=0
+				)res
+			ORDER BY res.parent,res.priority 
+		]]>
+	</sql-query>
+	
+	<sql-query name="cn.ffcs.srp.app.resource.findTreeOfMenu">
+		<![CDATA[
+			SELECT r.id,r.resource_key as "resourceKey",r.name,r.icon_cls as "iconCls",ri.resource_desc as "resourceDesc",0 as "ownership",r.priority FROM sys_resource r
+				LEFT JOIN sys_resource_item ri ON r.id=ri.resource_id  AND ri.is_main=1 
+				WHERE r.parent=? and r.enabled=1 ORDER BY r.priority,r.id
+		]]>
+	</sql-query>
+	<sql-query name="cn.ffcs.srp.app.resource.findTreeOfMenuOfUser">
+		<![CDATA[
+			SELECT r.id,r.resource_key AS "resourceKey",r.name,r.icon_cls AS "iconCls",ri.resource_desc AS "resourceDesc",0 as "ownership",r.priority FROM sys_resource r
+				LEFT JOIN sys_resource_item ri ON r.id=ri.resource_id  AND ri.is_main=1 AND view_type='0001'
+				WHERE r.parent=? AND r.enabled=1 AND r.view_type='0001'
+				AND (r.is_public=1 OR
+				EXISTS(SELECT rr.resource_id FROM sys_user u,sys_user_role ur,sys_role_resource rr WHERE u.id=ur.user_id AND ur.role_id=rr.role_id AND r.id=rr.resource_id AND u.id=?)
+				)
+				ORDER BY r.priority,r.id		
+		]]>
+	</sql-query>
+	<sql-query name="cn.ffcs.srp.app.resource.findFunctionsOfUser">
+		<![CDATA[
+			SELECT DISTINCT res.id,res.resource_key AS "resourceKey",res.name,res.icon_cls AS "iconCls",'' AS "resourceDesc",0 as "ownership",res.parent,res.priority FROM
+					(SELECT r.* FROM sys_resource r,sys_role_resource rs
+						WHERE r.ID=rs.resource_id AND r.view_type='0002' AND r.enabled=1 AND r.is_public=0 AND 
+						EXISTS(SELECT ur.* FROM sys_user_role ur WHERE ur.role_id=rs.role_id AND ur.user_id=?) 
+					 UNION ALL 
+						SELECT r.* FROM sys_resource r WHERE r.view_type='0002' AND r.enabled=1 AND r.is_public=1
+					)res
+				ORDER BY res.parent,res.priority	
+		]]>
+	</sql-query>
+	<sql-query name="cn.ffcs.srp.app.resource.findExcludeFunctionsOfUser">
+		<![CDATA[
+			SELECT DISTINCT r.id,r.resource_key AS "resourceKey",r.name,r.icon_cls AS "iconCls",'' AS "resourceDesc",1 AS "ownership" FROM sys_resource r
+						LEFT JOIN sys_role_resource rs ON r.ID=rs.resource_id
+						WHERE  r.view_type='0002' AND r.enabled=1 AND r.is_public=0 AND 
+						NOT EXISTS(SELECT ur.* FROM sys_user_role ur WHERE ur.role_id=rs.role_id AND ur.user_id=?)
+		]]>
+	</sql-query>
+	<sql-query name="cn.ffcs.srp.app.resource.findResourceTree">
+		<![CDATA[
+			SELECT id,resource_key AS "resourceKey",name,icon_cls AS "iconCls",parent AS "resourceDesc",0 as "ownership",priority
+				FROM sys_resource WHERE parent=? ORDER BY priority
+		]]>
+	</sql-query>
+</hibernate-mapping>

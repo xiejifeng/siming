@@ -1,0 +1,154 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:p="http://www.springframework.org/schema/p"
+	xmlns:context="http://www.springframework.org/schema/context" xmlns:task="http://www.springframework.org/schema/task"
+	xmlns:aop="http://www.springframework.org/schema/aop" xmlns:tx="http://www.springframework.org/schema/tx"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.2.xsd 
+	http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.2.xsd 
+	http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-3.2.xsd 
+	http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-3.2.xsd
+	http://www.springframework.org/schema/task http://www.springframework.org/schema/task/spring-task-3.1.xsd">
+
+	<context:component-scan base-package="cn.ffcs">
+        <context:exclude-filter type="annotation" expression="org.springframework.stereotype.Controller"/>
+    </context:component-scan>
+    
+	<context:annotation-config/>
+	<!-- 开启注解事务 只对当前配置文件有效 -->
+  	<tx:annotation-driven transaction-manager="transactionManager"/>
+  	<!-- 开启AOP监听 只对当前配置文件有效 -->
+	<aop:aspectj-autoproxy  expose-proxy="true"/>
+	<!-- <bean id="dataSource" class="org.springframework.jndi.JndiObjectFactoryBean">   
+        <property name="jndiName" value="java:OracleDS" />   
+	</bean> 
+	-->
+	<bean id="propertyConfigurer" class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+		<property name="locations">
+			<list>
+				<value>classpath:configure/jdbc.properties</value>
+				<!--  
+				<value>classpath:configure/mongo.properties</value>
+				-->
+			</list>
+		</property>
+	</bean>
+	<bean id="dataSource" class="com.mchange.v2.c3p0.ComboPooledDataSource">
+		<property name="driverClass" value="${jdbc.driverClassName}" />
+		<property name="jdbcUrl" value="${jdbc.url}" />
+		<property name="user" value="${jdbc.username}" />
+		<property name="password" value="${jdbc.password}" />
+		<property name="autoCommitOnClose" value="true"/>
+		<property name="checkoutTimeout" value="${cpool.checkoutTimeout}"/>
+		<property name="initialPoolSize" value="${cpool.minPoolSize}"/>
+		<property name="minPoolSize" value="${cpool.minPoolSize}"/>
+		<property name="maxPoolSize" value="${cpool.maxPoolSize}"/>
+		<property name="maxIdleTime" value="${cpool.maxIdleTime}"/>
+		<property name="acquireIncrement" value="${cpool.acquireIncrement}"/>
+		<property name="maxIdleTimeExcessConnections" value="${cpool.maxIdleTimeExcessConnections}"/>
+		<property name="maxStatements" value="${cpool.maxStatements}"/>
+	</bean>
+	<!--
+	<bean id="ds2" class="org.springframework.jdbc.datasource.DriverManagerDataSource">
+		<property name="driverClassName" value="${jdbc.driverClassName.mysql}" />
+		<property name="url" value="${jdbc.url.mysql}" />
+		<property name="username" value="${jdbc.username.mysql}" />
+		<property name="password" value="${jdbc.password.mysql}" />
+	</bean>
+	<bean id="dataSource" class="cn.ffcs.srp.core.repository.dataSource.MultipleDataSource">
+		<property name="defaultTargetDataSource" ref="ds1"></property>
+		<property name="targetDataSources">
+			<map>
+				<entry key="ds1" value-ref="ds1"></entry>
+				<entry key="ds2" value-ref="ds2"></entry>
+			</map>
+		</property>
+	</bean>
+	  -->
+    <bean id="sessionFactory" class="org.springframework.orm.hibernate4.LocalSessionFactoryBean">
+		<property name="dataSource" ref="dataSource"></property>
+		<property name="packagesToScan">
+			<list>
+				<value>cn.ffcs</value>
+			</list>
+		</property>
+		<property name="configLocations">
+			<list>
+				<value>classpath:configure/hibernate.cfg.xml</value>
+			</list>
+		</property>
+		<property name="mappingDirectoryLocations">
+			<list>
+				<value>classpath:sqls</value>
+			</list>
+		</property>
+		<property name="entityInterceptor">
+			<bean class="cn.ffcs.srp.core.repository.publicField.PublicFieldInterceptor"></bean>
+		</property>
+	</bean>
+	<bean id="transactionManager" class="org.springframework.orm.hibernate4.HibernateTransactionManager">
+	 	<property name="sessionFactory" ref="sessionFactory"></property>
+	</bean>
+	<aop:config>
+		<aop:advisor pointcut="execution(* cn.ffcs..service..*.*(..))" advice-ref="txAdvice" />
+		<!--
+		<aop:advisor pointcut="execution(* cn.ffcs..dao..*.*(..))" advice-ref="txAdvice" />
+		 -->
+	</aop:config>
+	<tx:advice id="txAdvice">
+		<tx:attributes>
+			<tx:method name="add*" rollback-for="Exception"/>
+			<tx:method name="save*" rollback-for="Exception"/>
+			<tx:method name="update*" rollback-for="Exception"/>
+			<tx:method name="delete*" rollback-for="Exception"/>
+			<tx:method name="remove*" rollback-for="Exception"/>
+			<tx:method name="do*" rollback-for="Exception"/>
+			<tx:method name="noDo*" rollback-for="Exception" propagation="REQUIRES_NEW"/>
+			<tx:method name="get*" read-only="true" />
+			<tx:method name="query*" read-only="true" />
+			<tx:method name="find*" read-only="true" />
+			<tx:method name="load*" read-only="true" />
+			<tx:method name="*" read-only="true" propagation="REQUIRED"/>
+		</tx:attributes>
+	</tx:advice>
+	
+    <!--国际化文件-->
+	<bean id="messageSource" class="cn.ffcs.srp.resource.SrpReloadableResourceBundleMessageSource">
+		<property name="defaultEncoding" value="UTF-8"></property>
+		<property name="cacheSeconds" value="-1"></property>
+		<property name="directoryLocations">
+			<list>
+				<value>classpath:resources</value>
+				<value>classpath:resources/app</value>
+				<value>classpath:resources/security</value>
+				<value>classpath:resources/busi</value>
+				<value>classpath:validators</value>
+				<value>classpath:validators/app</value>
+			</list>
+		</property>
+	</bean>
+	<!-- 数据验证 -->
+    <bean id="validator" class="org.springframework.validation.beanvalidation.LocalValidatorFactoryBean">
+    	<property name="providerClass" value="org.hibernate.validator.HibernateValidator"></property>
+    	<property name="validationMessageSource" ref="messageSource"></property>
+    </bean>
+	<!--
+	<bean name="jdbcTemplate" class="org.springframework.jdbc.core.JdbcTemplate">
+		<property name="dataSource">
+           <ref local="dataSource"/>
+        </property>
+	</bean>
+	<bean name="simpleJdbcTemplate" class="org.springframework.jdbc.core.simple.SimpleJdbcTemplate">
+		<constructor-arg ref="dataSource" />
+	</bean>
+	
+	<bean name="oracleSequenceMaxValueIncrementer" class="org.springframework.jdbc.support.incrementer.OracleSequenceMaxValueIncrementer">
+		<property name="dataSource" ref="dataSource"/>
+		<property name="incrementerName" value="default"/>
+	</bean>
+	-->
+		 
+	<task:scheduled-tasks>   
+	        <task:scheduled ref="loadTopicBackInfoJob" method="doJob" cron="0 0 1 * * ?"/>   
+	        <task:scheduled ref="loadTopicBackInfoJob" method="updateTopicBackStatus" cron="0 0 0 * * ?"/>   
+	</task:scheduled-tasks> 
+</beans>

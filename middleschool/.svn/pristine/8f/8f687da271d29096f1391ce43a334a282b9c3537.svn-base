@@ -1,0 +1,3 @@
+var message_collection={
+
+};

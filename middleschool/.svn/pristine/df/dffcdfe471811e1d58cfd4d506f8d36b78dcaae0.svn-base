@@ -1,0 +1,132 @@
+/**
+ * OpthisServiceImpl.java	  V1.0   2014年7月18日 上午11:05:36
+ *
+ * Copyright 2014 FUJIAN FUJITSU COMMUNICATION SOFTWARE CO., LTD. All rights reserved.
+ *
+ * Modification history(By    Time    Reason):
+ * 
+ * Description:
+ */
+
+package cn.ffcs.txb.service.product.impl;
+
+import java.io.Serializable;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
+
+import javax.annotation.Resource;
+
+import org.springframework.stereotype.Service;
+
+import cn.ffcs.srp.ui.model.PaginationData;
+import cn.ffcs.txb.back.controller.product.ProductPaginationDTO;
+import cn.ffcs.txb.common.model.Constant;
+import cn.ffcs.txb.dao.product.IProductDAO;
+import cn.ffcs.txb.entity.Product;
+import cn.ffcs.txb.service.product.IProductService;
+
+
+/**
+ * 功能描述：
+ *
+ * @author ：yudp
+ *
+ * 修改历史：(修改人，修改时间，修改原因/内容)
+ */
+@Service
+public class ProductServiceImpl implements IProductService {
+
+    @Resource
+    private IProductDAO productDAO;
+
+	@Override
+	public Product findProductById(String id) {
+		
+		return this.productDAO.get(Integer.valueOf(id));
+	}
+
+	@Override
+	public PaginationData<Map<String, Object>> listAllProduct(ProductPaginationDTO dto) {
+    	if(Constant.PRODUCT_All.equals(dto.getStatus())){
+    		dto.setStatus("");
+    	}
+		return this.productDAO.findByPaginationAndDynamicCondition("SQL_PRODUCT_1",dto,new String[][] { new String[] {"createtime", "date", "yyyy.MM.dd HH:mm:ss" }});
+	}
+
+	@Override
+	public void deleteProductByid(String id) {
+	     try {
+			Product product = new Product();
+			product.setId(Integer.valueOf(id));
+			this.productDAO.delete(product);
+		} catch (Exception e) {
+			throw new RuntimeException();
+		}		
+	}
+
+	@Override
+	public Map<String, Object> saveProduct(Product product) {
+		// TODO Auto-generated method stub
+		Map<String, Object> result = new HashMap<String, Object>();
+		try {
+			product.setCreatetime(new Date());
+			Serializable entity = this.productDAO.save(product);
+			result.put("resultCode", "0");
+			result.put("entity",entity);
+		} catch (Exception e) {
+			result.put("resultCode", "1");
+			throw new RuntimeException();
+		}
+		return result;
+	}
+
+	@Override
+	public void doupProductByid(String id) {
+	     try {
+	    	 Product product = this.productDAO.get(Integer.valueOf(id));
+	    	 product.setStatus(Constant.PRODUCT_UP);
+	    	 this.productDAO.save(product);
+		} catch (Exception e) {
+			throw new RuntimeException();
+		}	
+		
+	}
+
+	@Override
+	public void downProductByid(String id) {
+	     try {
+	    	 Product product = this.productDAO.get(Integer.valueOf(id));
+	    	 product.setStatus(Constant.PRODUCT_DOWN);
+	    	 this.productDAO.save(product);
+		} catch (Exception e) {
+			throw new RuntimeException();
+		}	
+		
+	}
+
+	@Override
+	public Map<String, Object> doSaveEditProduct(Product p) {
+		// TODO Auto-generated method stub
+		Map<String, Object> result = new HashMap<String, Object>();
+		try {
+			Product product = this.productDAO.get(p.getId());
+			product.setCreatetime(new Date());
+			product.setIntroduce(p.getIntroduce());
+			product.setMainimg(p.getMainimg());
+			product.setName(p.getName());
+			product.setScore(p.getScore());
+			product.setStatus(p.getStatus());
+			product.setStock(p.getStock());
+			Serializable entity = this.productDAO.save(product);
+			result.put("resultCode", "0");
+			result.put("entity",entity);
+		} catch (Exception e) {
+			result.put("resultCode", "1");
+			throw new RuntimeException();
+		}
+		return result;	
+	}
+    
+    
+}

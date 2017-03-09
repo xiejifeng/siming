@@ -1,0 +1,16 @@
+app.resource.main.title = \u8d44\u6e90\u7ba1\u7406
+resource.main.tree.title = \u8d44\u6e90\u6811
+resource.main.tree.root = \u8d44\u6e90\u7ba1\u7406
+resource.main.details.title = \u8d44\u6e90\u4fe1\u606f
+resource.operate.child.append = \u65b0\u5efa\u5b50\u8d44\u6e90
+resource.operate.append = \u65b0\u5efa\u8d44\u6e90
+resource.operate.remove = \u5220\u9664
+app.resource.resourceKey = \u5173\u952e\u5b57
+app.resource.name = \u8d44\u6e90\u540d
+app.resource.parent = \u4e0a\u7ea7\u8d44\u6e90
+app.resource.priority = \u4f18\u5148\u7ea7
+app.resource.viewType = \u7c7b\u578b
+app.resource.iconCls = \u6837\u5f0f
+app.resource.enabled = \u662f\u5426\u6fc0\u6d3b
+app.resource.isPublic = \u662f\u5426\u516c\u7528
+app.resource.remark = \u5907\u6ce8

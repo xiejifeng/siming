@@ -1,0 +1,10 @@
+app.message.readMsg.title = \u6d88\u606f\u9605\u8bfb 
+app.message.readed.button = \u5df2\u8bfb
+app.message.title = \u6807\u9898
+app.message.content = \u5185\u5bb9
+app.message.type = \u7c7b\u578b
+app.message.grade = \u91cd\u8981\u7a0b\u5ea6
+app.message.sender = \u53d1\u9001\u4eba
+app.message.sendDate = \u53d1\u9001\u65f6\u95f4
+app.message.action = \u4e8b\u4ef6
+app.message.attachment = \u9644\u4ef6

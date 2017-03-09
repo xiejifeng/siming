@@ -1,0 +1,22 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="cn.ffcs.srp.app.message.entity">
+	<sql-query name="cn.ffcs.srp.app.message.findPaginationMessages">
+		<![CDATA[
+			SELECT  m.id,m.msg_title "msgTitle",m.msg_type "msgType",m.grade,m.sender,m.send_date "sendDate" FROM sys_message m,sys_message_receive mr
+				WHERE m.id=mr.message_id AND mr.state='0500' AND mr.receiver=:receiver
+		]]>
+	</sql-query>
+	<sql-query name="cn.ffcs.srp.app.message.findCountByReceiver">
+		<![CDATA[
+			SELECT  COUNT(m.id) total FROM sys_message m,sys_message_receive mr
+				WHERE m.id=mr.message_id AND mr.state='0500' AND mr.receiver=?
+		]]>
+	</sql-query>
+	<sql-query name="cn.ffcs.srp.app.message.findTotalGroupByReceiver">
+		<![CDATA[
+			SELECT mr.receiver,COUNT(mr.message_id) total FROM sys_message_receive mr GROUP BY mr.receiver,mr.state HAVING mr.state='0500'
+		]]>
+	</sql-query>
+</hibernate-mapping>

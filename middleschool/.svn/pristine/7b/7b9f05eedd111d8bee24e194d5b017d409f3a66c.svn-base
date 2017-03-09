@@ -1,0 +1,48 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="cn.ffcs.srp.app.user.entity">
+	<class abstract="false" name="User" table="sys_user" dynamic-insert="true" dynamic-update="true">
+		<id column="id" type="long" name="id">
+			<generator class="native"></generator>
+		</id>
+		<property name="username" type="string" column="username"></property>
+		<property name="password" type="string" column="password"></property>
+		<property name="enabled" type="boolean" column="enabled"></property>
+		<property name="accountNonExpired" type="boolean" column="account_non_expired"></property>
+		<property name="accountNonLocked" type="boolean" column="account_non_locked"></property>
+		<property name="credentialsNonExpired" type="boolean" column="credentials_non_expired"></property>
+		<bag name="roles" table="sys_user_role" lazy="true">
+			<key column="user_id" foreign-key="id"></key>
+			<many-to-many column="role_id" class="cn.ffcs.srp.app.role.entity.Role" foreign-key="id"></many-to-many>
+		</bag>
+	</class>
+	<query name="cn.ffcs.srp.app.user.doLogout">
+		<![CDATA[
+			update User set enabled=? where id=?
+		]]>
+	</query>
+	<sql-query name="cn.ffcs.srp.app.user.findPaginationUsers">
+		<![CDATA[
+			select id,username,"" AS password,enabled,account_non_expired "accountNonExpired",account_non_locked "accountNonLocked",credentials_non_expired "credentialsNonExpired"
+				 from sys_user where 1=1
+				/**<#if (username??) && (username?trim != "")>**/ 
+					and username like :username 
+				/**</#if>**/
+				and enabled = :enabled 
+				and account_non_expired = :accountNonExpired
+				and account_non_locked = :accountNonLocked
+				and credentials_non_expired = :credentialsNonExpired
+		]]>
+	</sql-query>
+	<query name="cn.ffcs.srp.app.user.doLock">
+		<![CDATA[
+			update User set accountNonLocked=? where id=?
+		]]>
+	</query>
+	<query name="cn.ffcs.srp.app.user.delete">
+		<![CDATA[
+			delete from User u where u.id=?
+		]]>
+	</query>
+</hibernate-mapping>

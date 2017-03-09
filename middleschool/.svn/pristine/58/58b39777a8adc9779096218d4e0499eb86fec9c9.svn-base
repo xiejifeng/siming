@@ -1,0 +1,121 @@
+$(function(){
+	initOptHisTable();
+	var height = $(window).height();
+	$("#opthisTable").datagrid('resize', {
+		height : height - 57
+	}); 
+	
+	//艺考类型
+	$("#subject").selectParam({
+		required:true,
+		typeId:'1B',
+		defaultValue:'1B00',
+		panelHeight:100,
+		invalidMessage:'',
+		width:'98%'
+	});
+	
+	//艺考类型
+	$("#status").selectParam({
+		required:true,
+		typeId:'1D',
+		defaultValue:'1D02',
+		panelHeight:100,
+		invalidMessage:'',
+		width:'98%'
+	});
+	
+});
+
+function initOptHisTable() {
+	var height = $(window).height()-20;
+	$("#opthisTable")
+			.jDatagrid(
+					{
+						height : height,
+						width : "100%",
+						fit : false,
+						fitColumns : true,
+						nowrap : false,
+						striped : true,
+						singleSelect : true,
+						collapsible : true,
+						url : web_path + "answer/listBrushAnalysisInfo.do",
+						remoteSort : true,
+						isInitLoad : true,
+						rownumbers : true,
+						sortName : 'id',
+						sortOrder : 'desc',
+						pagination : true,
+						columns : [ [
+								{
+									title :'昵称',
+									field : 'nickname',
+									width : 200,
+									align : 'center'
+								},
+								{
+									title : '姓名',
+									field : 'name',
+									width : 200,
+									align : 'center'
+								},
+								{
+									title :'手机号',
+									field : 'tel',
+									width : 200,
+									align : 'center'
+								},
+								{
+									title : '题目ID',
+									field : 'topic_id',
+									width : 200,
+									align : 'center'
+								},
+								{
+									title : '科目',
+									field : 'topic_name',
+									width : 200,
+									align : 'center'
+								},
+								{
+									title : '正确/错误',
+									field : 'statusname',
+									width : 200,
+									align : 'center'
+								},
+								{
+									title : '做题时间',
+									field : 'createtime',
+									width : 200,
+									align : 'center'
+								}
+				
+								 ] ]
+
+					});
+}
+
+function queryBehaviorByParams() {
+	var params = {
+		"tel" : $("#tel").val().toString(),
+		"subject" : $("#subject").combo("getText"),
+		"startTime" :$("#startTime").val(),
+		"endTime":$("#endTime").val(),
+		"username":$("#username").val()
+		};
+
+	$("#opthisTable").jDatagrid("load", params);
+}
+
+function change(obj){
+	if(obj.value =='请输入...'){
+		obj.value = "";
+	}
+}
+
+function change1(obj){
+	if(obj.value ==''){
+		obj.value = "请输入...";
+	}
+}

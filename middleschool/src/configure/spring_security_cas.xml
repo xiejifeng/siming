@@ -1,0 +1,179 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<b:beans xmlns="http://www.springframework.org/schema/security"
+    xmlns:b="http://www.springframework.org/schema/beans"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:p="http://www.springframework.org/schema/p"
+    xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.2.xsd
+                        http://www.springframework.org/schema/security http://www.springframework.org/schema/security/spring-security-3.1.xsd">
+<!--
+    <global-method-security pre-post-annotations="enabled">
+        <expression-handler ref="expressionHandler"/>
+    </global-method-security>
+-->
+	<http pattern="/plugins/**" security="none"/>
+	<http pattern="/resources/**" security="none"/>
+	<http pattern="/message/**" security="none"/>
+	<http pattern="/fields/**" security="none"/>
+	<http pattern="/api/**" security="none"/>
+	<http pattern="/editor/**" security="none"/>
+	<http pattern="/explorer/**" security="none"/>
+	<http pattern="/libs/**" security="none"/>
+	<http pattern="/jasper/images/**" security="none"/>
+	<http pattern="/main/doCheckCode.srp*" security="none"/>
+	<http pattern="/main/login.srp*" security="none"/>
+	<http pattern="/**.html*" security="none"/>
+	<http pattern="/WEB-INF/jsp/app/main/403.jsp" security="none"/>
+	<http pattern="/WEB-INF/jsp/app/main/jsonstring.jsp" security="none"/>
+    <http auto-config="false" use-expressions="true" entry-point-ref="srpLoginUrlAuthenticationEntryPoint">
+        <anonymous enabled="false"/>
+        <access-denied-handler ref="srpAccessDeniedHandler"/>
+         
+        <!-- 避免ajax 被cache -->
+        <request-cache ref="httpSessionRequestCache"/>
+        
+        <!--session管理-->
+        <custom-filter ref="concurrencyFilter" after="CAS_FILTER"/>
+        
+         <!-- 登录过滤器 -->
+        <custom-filter ref="loginFilter" position="CAS_FILTER"  />
+        <custom-filter ref="requestSingleLogoutFilter" before="LOGOUT_FILTER" />
+        <custom-filter ref="singleLogoutFilter" before="CAS_FILTER" /> 
+        <!-- 认证过滤器 -->
+        <custom-filter ref="filterSecurityInterceptor" before="FILTER_SECURITY_INTERCEPTOR"/>
+        <session-management session-authentication-strategy-ref="sas"/>
+         
+    </http>
+    <!--无访问权限处理-->
+    <b:bean id="srpAccessDeniedHandler" class="cn.ffcs.srp.app.security.SrpAccessDeniedHandlerImpl">
+    	<b:property name="errorPage" value="/WEB-INF/jsp/app/main/403.jsp"></b:property>
+    </b:bean>
+    <!--save request处理-->
+    <b:bean id="httpSessionRequestCache" class="org.springframework.security.web.savedrequest.HttpSessionRequestCache">
+    	<b:property name="requestMatcher" ref="srpRequestMatcher"/>
+    </b:bean>
+    <b:bean id="srpRequestMatcher" class="cn.ffcs.srp.app.security.SrpRequestMatcher"></b:bean>
+    <!-- 登录验证器 -->
+    <b:bean id="loginFilter" class="org.springframework.security.cas.web.CasAuthenticationFilter">
+		<!-- 处理登录-->
+		<b:property name="filterProcessesUrl" value="/j_spring_cas_security_check"></b:property>
+		<b:property name="authenticationSuccessHandler" ref="loginLogAuthenticationSuccessHandler"></b:property>
+		<b:property name="authenticationFailureHandler" ref="simpleUrlAuthenticationFailureHandler"></b:property>
+		 
+		<b:property name="authenticationManager" ref="srpAuthenticationManager"></b:property>
+		<!--限制用户并发数-->
+		<b:property name="sessionAuthenticationStrategy" ref="sas"></b:property>
+	</b:bean>
+	<b:bean id="loginLogAuthenticationSuccessHandler" class="cn.ffcs.srp.app.security.SrpAuthenticationSuccessHandler">
+		<b:property name="alwaysUseDefaultTargetUrl" value="true" />  
+        <b:property name="defaultTargetUrl" value="/main/main.srp" />  
+		<b:property name="successHandler">
+			<b:bean class="cn.ffcs.srp.app.security.handler.support.DefaultLoginSuccessHandler">
+				<b:property name="handlers">
+					<b:list>
+						<b:bean class="cn.ffcs.srp.app.online.OnlineUserHandler"></b:bean>
+					</b:list>
+				</b:property>
+			</b:bean>
+		</b:property>
+	</b:bean>
+	<b:bean id="simpleUrlAuthenticationFailureHandler" class="cn.ffcs.srp.app.security.SrpAuthenticationFailureHandler">
+		<b:property name="defaultFailureUrl" value="http://sso.srp.com:8080/SRP1.6/main/main.srp"></b:property>
+	</b:bean>
+    <b:bean id="srpLoginUrlAuthenticationEntryPoint" class="org.springframework.security.cas.web.CasAuthenticationEntryPoint">
+    	<b:property name="loginUrl" value="https://sso.srp.com:8443/casServer/login?locale=zh_CN"></b:property>
+    	<b:property name="serviceProperties" ref="serviceProperties"></b:property>
+    </b:bean>
+    <b:bean id="serviceProperties" class="org.springframework.security.cas.ServiceProperties"
+        p:service="https://sso.srp.com:8443/SRP1.6/j_spring_cas_security_check"
+        p:sendRenew="false"/>
+    <!-- 认证过滤器 -->
+    <b:bean id="filterSecurityInterceptor" class="org.springframework.security.web.access.intercept.FilterSecurityInterceptor">
+    	<!-- 用户拥有的权限 -->
+    	<b:property name="authenticationManager" ref="srpAuthenticationManager" />
+    	<!-- 用户是否拥有所请求资源的权限 -->
+    	<b:property name="accessDecisionManager" ref="accessDecisionManager" />
+    	<!-- 资源与权限对应关系 -->
+    	<b:property name="securityMetadataSource" ref="srpInvocationSecurityMetadataSourceService" />
+    	<b:property name="observeOncePerRequest" value="false"/>
+    </b:bean>
+    <authentication-manager alias="srpAuthenticationManager">
+        <authentication-provider ref="casAuthenticationProvider"></authentication-provider>
+    </authentication-manager>
+    <b:bean id="casAuthenticationProvider" class="org.springframework.security.cas.authentication.CasAuthenticationProvider">
+        <b:property name="key" value="an_id_for_this_auth_provider_only"></b:property>
+        <b:property name="serviceProperties" ref="serviceProperties" />
+        <b:property name="authenticationUserDetailsService">
+        	<b:bean class="org.springframework.security.core.userdetails.UserDetailsByNameServiceWrapper">
+        		<b:property name="userDetailsService" ref="srpUserDetailsService"></b:property>
+        	</b:bean>
+        </b:property>
+    	<b:property name="ticketValidator">
+	      	<b:bean class="org.jasig.cas.client.validation.Cas20ServiceTicketValidator">
+	        	<b:constructor-arg index="0" value="https://sso.srp.com:8443/casServer"/>
+	      	</b:bean>
+    	</b:property>
+  	</b:bean>
+    <!-- 用户的密码加密或解密 -->
+ 	<b:bean id="passwordEncoder" class="org.springframework.security.authentication.encoding.Md5PasswordEncoder">
+ 		<b:property name="encodeHashAsBase64" value="true"></b:property>
+    </b:bean>
+    <!--用户拥有的权限-->
+    <b:bean id="srpUserDetailsService" class="cn.ffcs.srp.app.security.SrpUserDetailsService"/>
+    <!--用户是否拥有所请求资源的权限-->
+    <!--
+    <b:bean id="srpAccessDecisionManager" class="com.ffcs.srp.security.SrpAccessDecisionManager"></b:bean>
+    -->
+    <b:bean id="accessDecisionManager" class="org.springframework.security.access.vote.AffirmativeBased">
+	 	<!-- 没有显式定义的资源都保护起来。该属性默认值为false -->
+	 	<b:property name="allowIfAllAbstainDecisions" value="true"/>
+        <b:property name="decisionVoters">
+            <b:list>
+                <b:bean class="org.springframework.security.access.vote.RoleVoter">
+                    <b:property name="rolePrefix" value="ROLE_" />
+                </b:bean>
+                <b:bean class="org.springframework.security.access.vote.AuthenticatedVoter" />
+            </b:list>
+        </b:property>
+    </b:bean>
+    <!-- 资源与权限对应关系 -->
+    <b:bean id="srpInvocationSecurityMetadataSourceService" class="cn.ffcs.srp.app.security.SrpInvocationSecurityMetadataSourceService">
+    	<b:property name="resourcesOfAuthentication">
+    		<b:ref local="resourcesOfAuthentication"/>
+    	</b:property>
+    </b:bean>
+    <b:bean id="resourcesOfAuthentication" class="cn.ffcs.srp.app.security.ResourcesOfAuthentication">
+    	<b:property name="roleService" ref="roleService"></b:property>
+    </b:bean>
+    
+    <b:bean id="concurrencyFilter" class="cn.ffcs.srp.app.security.SrpConcurrentSessionFilter">
+    	<b:constructor-arg ref="sessionRegistry" />
+    	<b:constructor-arg value="https://sso.srp.com:8443/casServer/login?locale=zh_CN" />
+    	<!-- 是否要求登录 -->
+    	<b:property name="requiredSession" value="false"/>
+    	<b:property name="excludeUrls">
+	    	<b:list>
+	    		<b:value>/j_spring_security_check</b:value>
+	    	</b:list>
+	    </b:property>
+	</b:bean>
+	<b:bean id="sas" class="org.springframework.security.web.authentication.session.ConcurrentSessionControlStrategy">
+	    <b:constructor-arg ref="sessionRegistry" />
+	    <b:property name="maximumSessions" value="5" />
+	    <b:property name="exceptionIfMaximumExceeded" value="true"/>
+	</b:bean>
+	<b:bean id="sessionRegistry" class="org.springframework.security.core.session.SessionRegistryImpl" />
+
+    <!-- Automatically receives AuthenticationEvent messages -->
+    <b:bean id="loggerListener" class="org.springframework.security.authentication.event.LoggerListener"/>
+    <!-- 注销客户端 --> 
+    <b:bean id="singleLogoutFilter" class="org.jasig.cas.client.session.SingleSignOutFilter" /> 
+ 
+    <!-- 注销服务器端 --> 
+    <b:bean id="requestSingleLogoutFilter" class="org.springframework.security.web.authentication.logout.LogoutFilter"> 
+    	<b:constructor-arg value="https://sso.srp.com:8443/casServer/logout" />
+    	<b:constructor-arg> 
+    		<b:bean class="org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler"/> 
+    	</b:constructor-arg> 
+    	<b:property name="filterProcessesUrl" value="/j_spring_cas_security_logout" /> 
+    </b:bean> 
+</b:beans>

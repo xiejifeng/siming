@@ -1,0 +1,19 @@
+.dstyle1 {
+	font-weight: bold;
+	color: #ff6600;
+	text-decoration :underline;
+}
+.dstyle2 {
+	font-weight: bold;
+	color: #ffffff;
+	text-decoration :underline;
+}
+
+.webim_dstyle1 {
+	font-weight: bold;
+	color: #ff6600;
+}
+.webim_dstyle2 {
+	font-weight: bold;
+	color: #ffffff;
+}

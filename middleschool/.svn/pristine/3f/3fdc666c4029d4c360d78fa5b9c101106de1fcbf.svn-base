@@ -1,0 +1,76 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="cn.ffcs.srp.app.dictionary.entity">
+	<query name="cn.ffcs.srp.app.dictionary.queryAllCategory">
+		<![CDATA[
+			select dict from Dictionary dict where dict.enabled=1 order by dict.category.categoryCode,dict.priority 
+		]]>
+	</query>
+	<query name="cn.ffcs.srp.app.dictionary.queryCategorys">
+		<![CDATA[
+			select dict from Dictionary dict group by dict.category.categoryCode
+		]]>
+	</query>
+	<sql-query name="cn.ffcs.srp.app.dictionary.findPaginationDict">
+		<![CDATA[
+			SELECT t.category AS "code",t.remark AS "text",'' AS "association",'' AS "category",'' AS "keyword",1 AS "systemLevel",1 AS "enabled",0 AS "priority" 
+				FROM(SELECT d.category,d.remark
+				 FROM sys_dictionary d WHERE 1=1
+						/**<#if (code??) && (code?trim != "")>**/
+						AND d.category=:code
+						/**</#if>**/
+						/**<#if (text??) && (text?trim != "")>**/
+						AND d.remark like :text
+						/**</#if>**/
+				 GROUP BY d.category,d.remark)t ORDER BY code DESC
+		]]>
+	</sql-query>
+	<sql-query name="cn.ffcs.srp.app.dictionary.findPaginationSubDict">
+		<![CDATA[
+			SELECT d.code,d.text,d.association,d.category,d.keyword,d.system_level AS "systemLevel",d.enabled,d.priority FROM sys_dictionary d
+				WHERE d.category IN(/**<#list categorys as category>?<#if category_has_next>,</#if></#list>**/)
+				ORDER BY d.category DESC,d.association
+		]]>
+	</sql-query>
+	<sql-query name="cn.ffcs.srp.app.dictionary.findMaxOfCodeByCategory">
+		<![CDATA[
+			SELECT MAX(CODE) AS "code" FROM sys_dictionary WHERE category=?
+		]]>
+	</sql-query>
+	<sql-query name="cn.ffcs.srp.app.dictionary.findMaxOfCategory">
+		<![CDATA[
+			SELECT MAX(category) AS "category" FROM sys_dictionary
+		]]>
+	</sql-query>
+	<sql-query name="cn.ffcs.srp.app.dictionary.findTotalCategory">
+		<![CDATA[
+			SELECT COUNT(t.category) AS "total" FROM sys_dictionary t  WHERE t.category=? GROUP BY t.category
+		]]>
+	</sql-query>
+	<query name="cn.ffcs.srp.app.dictionary.findDictsByCategroyCode">
+		<![CDATA[
+			from Dictionary where category.categoryCode=?  AND association IS NULL
+		]]>
+	</query>
+	<query name="cn.ffcs.srp.app.dictionary.findDictsByAssociation">
+		<![CDATA[
+			from Dictionary where association=?
+		]]>
+	</query>
+	<sql-query name="cn.ffcs.srp.app.dictionary.deleteByCode">
+		<![CDATA[
+			DELETE FROM sys_dictionary WHERE code=?
+		]]>
+	</sql-query>
+	<sql-query name="cn.ffcs.srp.app.dictionary.deleteByCategory">
+		<![CDATA[
+			DELETE FROM sys_dictionary WHERE category=?
+		]]>
+	</sql-query>
+	<sql-query name="cn.ffcs.srp.app.dictionary.deleteByAssociation">
+		<![CDATA[
+			DELETE FROM sys_dictionary WHERE association=?
+		]]>
+	</sql-query>
+</hibernate-mapping>

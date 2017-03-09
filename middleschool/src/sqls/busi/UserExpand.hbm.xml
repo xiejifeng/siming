@@ -1,0 +1,108 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+	<sql-query name="SQL_USEREXPAND_1">
+     <![CDATA[
+     	select r.id,r.name as text from sys_role r,role_expand e
+     	where r.id = e.roleId and e.createName = ?
+     ]]>
+	</sql-query>
+	<sql-query name="SQL_USEREXPAND_14">
+     <![CDATA[
+     	select r.id,r.name as text from sys_role r
+     ]]>
+	</sql-query>
+	<sql-query name="SQL_USEREXPAND_2">
+     <![CDATA[
+     	SELECT r.id as "id",r.name as "text",r.parent as "parent",r.icon_cls as "iconCls",rr.role_id as "roleId",r.priority FROM sys_resource r 
+				, sys_role_resource rr  
+ 				WHERE r.is_public=0 and  r.id=rr.resource_id  AND rr.role_id=? ORDER BY r.parent,r.priority,r.id
+     ]]>
+	</sql-query>
+	<sql-query name="SQL_USEREXPAND_16">
+     <![CDATA[
+     	SELECT r.id as "id",r.name as "text",r.parent as "parent",r.icon_cls as "iconCls",r.priority FROM sys_resource r 
+ 				WHERE r.is_public=0   ORDER BY r.parent,r.priority,r.id
+     ]]>
+	</sql-query>
+	<sql-query name="SQL_USEREXPAND_3">
+     <![CDATA[
+     	select r.id,r.name as text from sys_role r,sys_user_role u
+     	where r.id = u.role_id 
+   		and u.user_id = ?
+     ]]>
+	</sql-query>
+
+	<sql-query name="SQL_USEREXPAND_4">
+     <![CDATA[
+     	update  sys_user set password = ? where id = ?
+     ]]>
+	</sql-query>
+
+	<sql-query name="SQL_USEREXPAND_5">
+		<![CDATA[
+			select s.id,s.username,u.insertDate,u.createName
+				 from sys_user s,user_expand u where 1=1
+				    and s.account_non_expired = 1
+				/**<#if (username??) && (username?trim != "")>**/ 
+					and s.username like ?
+				/**</#if>**/
+				  and s.id = u.userId
+				 and  u.userId in(select userId from user_expand where createName = ?)
+		]]>
+	</sql-query>
+
+	<sql-query name="SQL_USEREXPAND_15">
+		<![CDATA[
+			select s.id,s.username,u.insertDate,u.createName
+				 from sys_user s,user_expand u where 1=1
+				    and s.account_non_expired = 1
+				/**<#if (username??) && (username?trim != "")>**/ 
+					and s.username like ?
+				/**</#if>**/
+				  and s.id = u.userId
+		]]>
+	</sql-query>
+	<sql-query name="SQL_USEREXPAND_6">
+		<![CDATA[
+			select max(id) as userId from sys_user
+		]]>
+	</sql-query>
+
+	<sql-query name="SQL_USEREXPAND_7">
+		<![CDATA[
+			insert into sys_user_role(user_id,role_id) values(?,?)
+		]]>
+	</sql-query>
+	<sql-query name="SQL_USEREXPAND_8">
+		<![CDATA[
+			insert into user_expand(userId,insertDate,createName,logingCount) values(?,?,?,?)
+		]]>
+	</sql-query>
+	<sql-query name="SQL_USEREXPAND_9">
+		<![CDATA[
+			insert into sys_user(username,password,enabled,account_non_expired,account_non_locked,credentials_non_expired) values(?,?,?,?,?,?)
+		]]>
+	</sql-query>
+	<sql-query name="SQL_USEREXPAND_10">
+		<![CDATA[
+			select username from sys_user where username = ?
+		]]>
+	</sql-query>
+	<sql-query name="SQL_USEREXPAND_11">
+		<![CDATA[
+			delete from sys_user_role where user_id = ?
+		]]>
+	</sql-query>
+	<sql-query name="SQL_USEREXPAND_12">
+		<![CDATA[
+			delete from user_expand where userId = ?
+		]]>
+	</sql-query>
+	<sql-query name="SQL_USEREXPAND_13">
+		<![CDATA[
+			delete from sys_user where id = ?
+		]]>
+	</sql-query>
+</hibernate-mapping>

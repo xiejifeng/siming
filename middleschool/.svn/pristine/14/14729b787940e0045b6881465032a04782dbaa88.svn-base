@@ -1,0 +1,158 @@
+package cn.ffcs.txb.app.controller.personal;
+
+import java.util.List;
+import java.util.Map;
+
+import javax.annotation.Resource;
+import javax.servlet.http.HttpServletRequest;
+
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
+
+import cn.ffcs.txb.common.model.Constant;
+import cn.ffcs.txb.entity.Exchange;
+import cn.ffcs.txb.entity.Product;
+import cn.ffcs.txb.service.personal.IPersonalService;
+import cn.ffcs.txb.service.product.IProductService;
+
+@Controller
+@RequestMapping(value = "/appScore")
+public class AppScoreController {
+	@Resource
+	private IProductService  productService;
+	@Resource
+	private IPersonalService  personalService;
+	
+	/**
+	 * 进入积分商品列表页面
+	 * @param request
+	 * @return
+	 */
+    @RequestMapping(value="/getProducts.html", method = RequestMethod.GET)
+    public String getProducts(HttpServletRequest request){
+    	// 获取库存不为0的商品
+    	List<Map<String, Object>> products= productService.findAll();
+    	request.setAttribute("products", products);
+    	// 用户积分获取，先判断用户是否登录
+    	Map<String, Object> userInfo = (Map<String, Object>) request.getSession().getAttribute(Constant.LOGIN_USER_INFO);
+		if(userInfo!=null){
+			request.setAttribute("score", userInfo.get("score"));
+		}
+    	
+        return "personal/scoreExchange";
+    }
+
+    /**
+     * 商品详情页面
+     * @param request
+     * @return
+     */
+    @RequestMapping(value="/getProductDetail.html", method = RequestMethod.GET)
+    public String getProductDetail(HttpServletRequest request, String id){
+    	Product prod = productService.findProductById(id);
+    	request.setAttribute("product", prod);
+    	List<Map<String, Object>> prodImages = productService.getProdImages(prod.getId());
+    	if (prodImages != null && prodImages.size()>0) {
+    		request.setAttribute("images", prodImages);
+    	}
+        return "personal/exchangeDetail";
+    }
+    
+    /**
+     * 是否可以积分兑换此商品
+     * @param request
+     * @param id
+     * @return
+     */
+    @RequestMapping(value="/isExchange.html")
+    //@ResponseBody
+    public String isExchange(HttpServletRequest request, String id){
+    	// 用户积分获取，先判断用户是否登录
+    	Map<String, Object> userInfo = (Map<String, Object>) request.getSession().getAttribute(Constant.LOGIN_USER_INFO);
+		if(userInfo!=null){
+			Product prod = productService.findProductById(id);
+			int userScore = Integer.parseInt(String.valueOf(userInfo.get("score")) );
+			if(userScore >= prod.getScore()) {
+				// 可以兑换
+				request.setAttribute("productid", id);
+				return "personal/contactDetail";
+			} else {	//用户积分不足，不允许兑换
+				request.setAttribute("failed", 1);
+				return "personal/exchangeRet";
+			}
+		} 
+		return null;
+    }
+    
+    private boolean isValidateOK(Exchange exchange) {
+    	String address = exchange.getAddress();
+    	String name = exchange.getName();
+    	String tel = exchange.getTel();
+    	if (address == null || address.trim().length()==0) {
+    		return false;
+    	}
+    	if (name == null || name.trim().length()==0) {
+    		return false;
+    	}
+    	if (tel == null || tel.trim().length()==0) {
+    		return false;
+    	}
+    	return true;
+    }
+    /**
+     * 积分兑换申请
+     * @param request
+     * @param id
+     * @return
+     */
+    @RequestMapping(value="/exchange.html", method=RequestMethod.POST)
+    public String exchange(HttpServletRequest request, Exchange exchange){
+    	//验证提交的数据是否为空
+    	if (!isValidateOK(exchange)) {
+    		request.setAttribute("failed", -1);
+    		return "personal/exchangeRet";
+    	}
+    	// 用户积分获取，先判断用户是否登录
+    	Map<String, Object> userInfo = (Map<String, Object>) request.getSession().getAttribute(Constant.LOGIN_USER_INFO);
+		if(userInfo!=null){
+			// 获取商品
+			Product prod = productService.findProductById(String.valueOf(exchange.getProductid()));
+			if (prod != null) {
+				// 生成商品兑换记录
+				// 扣减商品库存	
+				// 扣减用户积分，生成积分扣减记录
+				int retFlag = personalService.doApplyScoreChange(prod,userInfo,exchange);
+				
+				if(retFlag == 1) {	// 用户积分不足或物品库存不够，不允许兑换
+					request.setAttribute("failed", retFlag);
+				}else if (retFlag == 0) {	// 兑换申请成功
+					request.setAttribute("succeed", retFlag);
+				}
+			}
+		}
+    	return "personal/exchangeRet";
+    }
+    
+    /**
+     * 
+     * 功能描述：审核学生信息
+     *
+     * @author ：余冬平
+     * 创建日期 ：2014年12月24日 上午10:16:59
+     *
+     * @return
+     *
+     * 修改历史 ：(修改人，修改时间，修改原因/内容)
+     */
+    @RequestMapping(value="/doPassCheckStuInfo.html")
+    @ResponseBody
+    public Map<String, Object> doPassCheckStuInfo(@RequestParam Map<String, Object> reqMap,HttpServletRequest request){
+    	String userIds[]  = reqMap.get("userIds").toString().split(",");
+    	Map<String, Object>  result= null;
+
+    	return result;
+    }
+}

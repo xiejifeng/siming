@@ -1,0 +1,329 @@
+/**
+ * FileOperateUtil.java	  V1.0   2014年9月22日 上午9:15:46
+ *
+ * Copyright 2014 FUJIAN FUJITSU COMMUNICATION SOFTWARE CO., LTD. All rights reserved.
+ *
+ * Modification history(By    Time    Reason):
+ * 
+ * Description:
+ */
+
+package cn.ffcs.txb.common.util;
+
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Properties;
+import sun.misc.BASE64Decoder;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import org.springframework.util.FileCopyUtils;
+import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.multipart.MultipartHttpServletRequest;
+
+import cn.ffcs.srp.util.i18n.GlobalUtil;
+import cn.ffcs.srp.util.i18n.PropertiesUtil;
+
+/**
+ * 
+ * @author yudp
+ * @date 2012-5-5 下午12:05:57
+ */
+public class FileOperateUtil {
+	private static final String REALNAME = "realName";
+	private static final String STORENAME = "storeName";
+	private static final String SIZE = "size";
+	private static final String CONTENTTYPE = "contentType";
+	private static final String CREATETIME = "createTime";
+	private static final String ISIMAGE = "isImage";
+	private static final String[] IMAGESUFFIX = { "BMP", "bmp", "JPG", "jpg","JPEG", "jpeg", "PNG", "png", "gif", "GIF" };
+	private static String loaclFileDir;
+	private static String loaclImageDir;
+	private static String netFilePath;
+	private static Properties properties = null;
+	static {
+		try {
+			properties = PropertiesUtil.getProperties("configure/global.properties");
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+
+	/**
+	 * 将上传的文件进行重命名
+	 * 
+	 * @author geloin
+	 * @date 2012-3-29 下午3:39:53
+	 * @param name
+	 * @return
+	 */
+	private static String rename(String name) {
+
+		Long now = Long.parseLong(new SimpleDateFormat("yyyyMMddHHmmss")
+				.format(new Date()));
+		Long random = (long) (Math.random() * now);
+		String fileName = now + "" + random;
+
+		if (name.indexOf(".") != -1) {
+			fileName += name.substring(name.lastIndexOf("."));
+		}
+
+		return fileName;
+	}
+
+	public static String getDomainPath() {
+		String domainPath = "http://xsc.i3ke.com/smjy";
+		if (properties != null) {
+			domainPath = properties.getProperty("domainPath");
+		} 
+		return domainPath;
+	}
+	
+	public static Integer getWechatFlag() {
+		Integer wechatFlag = 1;
+		// wechat=0开启微信
+		if (properties != null) {
+			wechatFlag = Integer.valueOf(properties.getProperty("wechat"));
+		}
+		
+		return wechatFlag;
+	}
+	
+	/**
+	 * 上传文件
+	 * 
+	 * @author geloin
+	 * @date 2012-5-5 下午12:25:47
+	 * @param request
+	 * @param params
+	 * @param values
+	 * @return
+	 * @throws Exception
+	 */
+	public static List<Map<String, Object>> upload(HttpServletRequest request)
+			throws Exception {
+		//Properties properties = PropertiesUtil.getProperties("configure/global.properties");
+		loaclFileDir = properties.getProperty("localfiledir");
+		loaclImageDir = properties.getProperty("localimagedir");
+		netFilePath = properties.getProperty("netfilepath");
+		List<Map<String, Object>> result = new ArrayList<Map<String, Object>>();
+		MultipartHttpServletRequest mRequest = (MultipartHttpServletRequest) request;
+		Map<String, MultipartFile> fileMap = mRequest.getFileMap();
+		/**
+		 * 图片存放路径
+		 */
+		String loaclImageDir = FileOperateUtil.loaclImageDir;
+		// 文件存放路径
+		String loaclFileDir = FileOperateUtil.loaclFileDir;
+
+		File filepath = new File(loaclFileDir);
+		File imagepath = new File(loaclImageDir);
+
+		if (!filepath.exists()) {
+			filepath.mkdir();
+		}
+		if (!imagepath.exists()) {
+			imagepath.mkdir();
+		}
+
+		String fileName = null;
+		String fileSuffix = null;
+		int i = 0;
+		for (Iterator<Map.Entry<String, MultipartFile>> it = fileMap.entrySet()
+				.iterator(); it.hasNext(); i++) {
+
+			Map.Entry<String, MultipartFile> entry = it.next();
+			MultipartFile mFile = entry.getValue();
+			// 原始文件名
+			fileName = mFile.getOriginalFilename();
+			fileSuffix = fileName.substring(fileName.lastIndexOf(".") + 1);
+
+			if ("".equals(fileName) || fileName.length() == 0) {
+
+				continue;
+			}
+
+			// 经过更改之后的文件名
+			String storeName = rename(fileName);
+			boolean isImage = contains(IMAGESUFFIX, fileSuffix);
+			BufferedOutputStream outputStream = null;
+			long length;
+			if (isImage) {
+				// 文件存放路径
+				String realImagePath = loaclImageDir + storeName;
+				outputStream = new BufferedOutputStream(new FileOutputStream(
+						realImagePath));
+				length = new File(realImagePath).length();
+			} else {
+				// 文件存放路径
+				String realFilePath = loaclFileDir + storeName;
+				outputStream = new BufferedOutputStream(new FileOutputStream(
+						realFilePath));
+				length = new File(realFilePath).length();
+			}
+
+			FileCopyUtils.copy(mFile.getInputStream(), outputStream);
+			/**
+			 * 进行数据库保存
+			 * 
+			 * 保存字段需要有
+			 * 
+			 * 1:原始的文件名 fileName 2:新的文件路径 filePath 3:文件大小 new
+			 * File(filePath).length() 4:文件的创建日期 new Date()
+			 * 
+			 */
+
+			Map<String, Object> map = new HashMap<String, Object>();
+			// 固定参数值对
+			map.put(FileOperateUtil.REALNAME, fileName);
+			map.put(FileOperateUtil.STORENAME, storeName);
+			map.put(FileOperateUtil.ISIMAGE, isImage);
+			map.put(FileOperateUtil.SIZE, length);
+			map.put(FileOperateUtil.CONTENTTYPE, "application/octet-stream");
+			map.put(FileOperateUtil.CREATETIME, new Date());
+			map.put("url", netFilePath + storeName);
+			result.add(map);
+		}
+		return result;
+	}
+
+	/**
+	 * 下载
+	 * 
+	 * @author geloin
+	 * @date 2012-5-5 下午12:25:39
+	 * @param request
+	 * @param response
+	 * @param storeName
+	 * @param contentType
+	 * @param realName
+	 * @throws Exception
+	 */
+	public static void download(HttpServletRequest request,
+			HttpServletResponse response, String storeName, String contentType,
+			String realName) throws Exception {
+		response.setContentType("text/html;charset=UTF-8");
+		request.setCharacterEncoding("UTF-8");
+		BufferedInputStream bis = null;
+		BufferedOutputStream bos = null;
+		String netFilePath = FileOperateUtil.netFilePath;
+		String downLoadPath = netFilePath + storeName;
+		HttpURLConnection httpURLConnection = (HttpURLConnection) (new URL(
+				downLoadPath).openConnection());
+		int filelength = httpURLConnection.getContentLength();
+		httpURLConnection.connect();
+		response.setContentType(contentType);
+		response.setHeader("Content-disposition", "attachment; filename="
+				+ new String(realName.getBytes("utf-8"), "ISO8859-1"));
+		response.setHeader("Content-Length", String.valueOf(filelength));
+		bis = new BufferedInputStream(httpURLConnection.getInputStream());
+		bos = new BufferedOutputStream(response.getOutputStream());
+		byte[] buff = new byte[2048];
+		int bytesRead;
+		while (-1 != (bytesRead = bis.read(buff, 0, buff.length))) {
+			bos.write(buff, 0, bytesRead);
+		}
+		bis.close();
+		bos.close();
+		httpURLConnection.disconnect();
+	}
+
+	/**
+	 * 判断某个字符串是否存在于数组中
+	 * 
+	 * @param stringArray
+	 *            原数组
+	 * @param source
+	 *            查找的字符串
+	 * @return 是否找到
+	 */
+	public static boolean contains(String[] stringArray, String source) {
+		// 转换为list
+		List<String> tempList = Arrays.asList(stringArray);
+		// 利用list的包含方法,进行判断
+		if (tempList.contains(source)) {
+			return true;
+		} else {
+			return false;
+		}
+	}
+
+
+	// base64字符串转化成图片
+	public static Map<String, String> GenerateImage(String imgStr,HttpServletRequest request){ // 对字节数组字符串进行Base64解码并生成图片
+		Map<String, String> result = new HashMap<>();
+		imgStr = imgStr.substring(imgStr.indexOf("base64,")+7, imgStr.length());
+		String storeName = rename("x.png");
+		if (imgStr == null) // 图像数据为空
+			return null;
+		BASE64Decoder decoder = new BASE64Decoder();
+		try {
+			loaclImageDir = GlobalUtil.getValue("localimagedir");
+			netFilePath = GlobalUtil.getValue("netfilepath");
+			String path=request.getSession().getServletContext().getRealPath("/");
+			String realPath = path.substring(0, path.indexOf("webapps"))+"upload"+System.getProperty("file.separator", "\\")+storeName;;
+			System.out.println(realPath);
+			// Base64解码
+			byte[] b = decoder.decodeBuffer(imgStr);
+			for (int i = 0; i < b.length; ++i) {
+				if (b[i] < 0) {// 调整异常数据
+					b[i] += 256;
+				}
+			}
+			// 生成jpeg图片
+			OutputStream out = new FileOutputStream(realPath);
+			out.write(b);
+			out.flush();
+			out.close();
+			result.put("url", netFilePath+storeName);
+			result.put("name", storeName);
+			return result;
+		} catch (Exception e) {
+			return null;
+		}
+	}
+	// base64字符串转化成图片
+	public static Map<String, String> GenerateImage(HttpServletRequest request,InputStream inputStream,String name){
+		Map<String, String> result = new HashMap<>();
+		String storeName = rename(name);
+		try {
+			loaclImageDir = GlobalUtil.getValue("localimagedir");
+			netFilePath = GlobalUtil.getValue("netfilepath");
+			String path=request.getSession().getServletContext().getRealPath("/");
+			String realPath = path.substring(0, path.indexOf("webapps"))+"upload"+System.getProperty("file.separator", "\\")+storeName;;
+			// 生成jpeg图片
+			OutputStream out = new FileOutputStream(realPath);
+			byte[] b=new byte[1024];
+			int a=0;
+			while((a=inputStream.read(b))>0){
+				out.write(b);
+			}
+			out.flush();
+			out.close();
+			result.put("url", netFilePath+storeName);
+			result.put("name", storeName);
+			return result;
+		} catch (Exception e) {
+			return null;
+		}
+	}
+
+}
