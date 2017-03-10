@@ -1,0 +1,12 @@
+*.class
+*.iml
+.checkstyle
+.classpath
+.project
+.project.bak
+.mymetadata
+target/
+bin/
+.settings/
+.svn/
+.idea/
